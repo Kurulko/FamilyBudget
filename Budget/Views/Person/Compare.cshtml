@@ -1,0 +1,64 @@
+﻿@using System.Linq
+@model GetMoneyAndSpendMoneyAndPerson
+@{
+    ViewBag.Back = $"/Person/Person";
+    ViewBag.Title = "Сравнение";
+}
+<h5>
+    <em>
+        Кол-во денег на данный момент:<br />
+    </em>
+</h5>
+<h6>
+    <em>
+        На карте: @Model.NowMoneyInCart
+        <br />
+        Наличными: @Model.NowMoneyInCash
+    </em>
+</h6>
+<br />
+<br />
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th colspan=3 style="text-align:center;">Траты</th>
+            <th></th>
+            <th colspan=3 style="text-align:center;">Получения</th>
+        </tr>
+        <tr>
+            @for (int i = 0; i < 2; ++i)
+            {
+                <th>Картой</th>
+                <th>Наличкой</th>
+                <th>Сумма</th>
+                if (i == 0)
+                {
+                    <th></th>
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            List<SpendMoney> purchases = Model.Spend;
+            List<GetMoney> pays = Model.Get;
+
+            var getAndSpend = Compare.CompareGetAndSpend(purchases, pays);
+            @foreach (var item in getAndSpend)
+            {
+                <tr>
+                    <th colspan=7 style="text-align:center;color:blue;">@item.Month</th>
+                </tr>
+                <tr>
+                    <td>@item.SpendCart</td>
+                    <td>@item.SpendCash</td>
+                    <td>@(item.SpendCash + item.SpendCart)</td>
+                    <td></td>
+                    <td>@item.GetCart</td>
+                    <td>@item.GetCash</td>
+                    <td>@(item.GetCash + item.GetCart)</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

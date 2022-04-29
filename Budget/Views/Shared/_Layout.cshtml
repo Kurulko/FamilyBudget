@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        header {
+            min-height: 35px;
+            background-color: black;
+            color: white;
+            text-align: center;
+        }
+
+        a:hover {
+            text-decoration-line: none;
+        }
+
+        .my_input{
+            width:50%;
+            text-align:center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        span,label,th,td,input,option,select{
+            font-style: oblique;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <strong><em>@ViewData["Title"]</em></strong>
+        @{
+            var back = ViewData["Back"];
+        }
+        @if (back != null)
+        {
+            <a href= @back.ToString() class="btn btn-outline-info" style="margin-left:30%;">Назад</a>
+        }
+    </header>
+
+    <br />
+    <center>
+        @RenderBody()
+    </center>
+    <br />
+
+    <footer class="border-top footer text-muted">
+        <div class="container" style="font-style: oblique;">
+            &copy; 2022 - Семейный бютжет
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-action="Logout" asp-controller="Account">Выйти</a>
+            }
+            @RenderSection("Link", required: false)
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

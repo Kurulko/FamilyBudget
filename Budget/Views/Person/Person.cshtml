@@ -1,0 +1,19 @@
+﻿@using System.Linq
+@model string
+@{
+    ViewBag.Title = Model;
+    ViewBag.Back = "/Home/Index";
+}
+
+<a asp-controller="Person" asp-action="Purchases" class="btn btn-outline-primary">
+    <em>Затраты</em>
+</a>
+<br /><br />
+<a asp-controller="Person" asp-action="Pay" class="btn btn-outline-primary">
+    <em>Получение</em>
+</a>
+<br /><br />
+<a asp-controller="Person" asp-action="Compare" class="btn btn-outline-primary">
+    <em>Сравнение</em>
+</a>
+

@@ -1,0 +1,29 @@
+﻿@model SpendMoney
+@{
+    ViewBag.Title = $"Изменение товара {Model.Name}";
+    ViewBag.Back = $"/Person/Purchases";
+}
+
+<form method="post" class="form-group">
+    <div asp-validation-summary="ModelOnly" class="text-danger" style="font-style: oblique;"></div>
+
+    <label asp-for="Name"></label>
+    <p><span asp-validation-for="Name" class="text-danger"></span></p>
+    <input asp-for="Name" class="form-control my_input" />
+    <br />
+    <label asp-for="Money"></label>
+    <p><span asp-validation-for="Money" class="text-danger"></span></p>
+    <input asp-for="Money" class="form-control my_input" />
+    <br />
+    <label asp-for="IsCash"></label>
+    <p><span asp-validation-for="IsCash" class="text-danger"></span></p>
+    <input asp-for="IsCash" class="form-control my_input" />
+    <br />
+    <label asp-for="Time"></label>
+    <p><span asp-validation-for="Time" class="text-danger"></span></p>
+    <input asp-for="Time" class="form-control my_input" />
+    
+    <input type="hidden" name="Id" value=@Model.Id />
+    <br />
+    <input type="submit" value="Отправить" class="btn btn-outline-primary"/>
+</form>
