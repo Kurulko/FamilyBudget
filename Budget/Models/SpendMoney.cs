@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Budget.Models
+namespace Budget.Models;
+
+[Table("SpendMoney")]
+public class SpendMoney : OperationsWithMoney
 {
-    [Table("SpendMoney")]
-    public class SpendMoney : OperationsWithMoney
-    {
-        public string WasMoney { get; set; }
-    }
+    public string WasMoney { get; set; }
 }

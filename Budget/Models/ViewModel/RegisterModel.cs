@@ -1,30 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Budget.Attributes;
+using System.ComponentModel.DataAnnotations;
 
-namespace Budget.Models.ViewModel
+namespace Budget.Models.ViewModel;
+
+public class RegisterModel
 {
-    public class RegisterModel
-    {
-        [Display(Name = "Имя")]
-        [Required(ErrorMessage = "Введите свое имя")]
-        public string Name { get; set; }
+    [RequiredEnter]
+    public string Name { get; set; }
 
-        [Display(Name = "Почта")]
-        [Required(ErrorMessage = "Введите свою почту")]
-        [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
+    [RequiredEnter]
+    [DataType(DataType.EmailAddress)]
+    public string Email { get; set; }
 
-        [Display(Name = "Пароль")]
-        [Required(ErrorMessage = "Придумайте пароль")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+    [RequiredEnter]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
 
-        [Display(Name = "Повторный пароль")]
-        [Required(ErrorMessage = "Повторите пароль")]
-        [DataType(DataType.Password)]
-        [Compare("Password",ErrorMessage = "Пароли не совпадают")]
-        public string ConfirmPassword { get; set; }
+    [RequiredEnter("Repeat {0}")]
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "The passwords doesn't match")]
+    public string ConfirmPassword { get; set; }
 
-        [Display(Name = "Запомнить меня")]
-        public bool RememberMe { get; set; }
-    }
+    [Display(Name = "Remember me?")]
+    public bool IsRememberMe { get; set; }
 }

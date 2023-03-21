@@ -8,57 +8,56 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Budget.Controllers
+namespace Budget.Controllers;
+
+public class PurchasesForEveryoneController : Controller
 {
-    public class PurchasesForEveryoneController : Controller
+    public BudgetContext Db { get; set; }
+    public PurchasesForEveryoneController(BudgetContext context)
+       => Db = context;
+
+    public IActionResult Result()
     {
-        public BudgetContext Db { get; set; }
-        public PurchasesForEveryoneController(BudgetContext context)
-           => Db = context;
+        var moneyAndPerson = Db.MoneyForEveryone
+            .Include(m => m.Person).Select(m => new MoneyForEveryoneAndPerson { PersonId = m.PersonId, Money = m, 
+                Name = m.Person.UserName }).ToList();
+        return View(moneyAndPerson);
+    }
 
-        public IActionResult Result()
-        {
-            var moneyAndPerson = Db.MoneyForEveryone
-                .Include(m => m.Person).Select(m => new MoneyForEveryoneAndPerson { PersonId = m.PersonId, Money = m, 
-                    Name = m.Person.UserName }).ToList();
-            return View(moneyAndPerson);
-        }
+    [HttpGet]
+    public IActionResult Delete()
+    {
+        Db.MoneyForEveryone.RemoveRange(Db.MoneyForEveryone);
+        Db.SaveChanges();
+        return RedirectToAction("Result");
+    }
 
-        [HttpGet]
-        public IActionResult Delete()
+    [HttpGet]
+    public IActionResult Add()
+    {
+        ViewBag.Names = Db.Users.Select(p => new NameAndId { Id = p.Id, Name = p.UserName }).ToList();
+        return View();
+    }
+    [HttpPost]
+    public IActionResult Add(MoneyForEveryone value)
+    {
+        if (ModelState.IsValid)
         {
-            Db.MoneyForEveryone.RemoveRange(Db.MoneyForEveryone);
-            Db.SaveChanges();
-            return RedirectToAction("Result");
-        }
-
-        [HttpGet]
-        public IActionResult Add()
-        {
-            ViewBag.Names = Db.Users.Select(p => new NameAndId { Id = p.Id, Name = p.UserName }).ToList();
-            return View();
-        }
-        [HttpPost]
-        public IActionResult Add(MoneyForEveryone value)
-        {
-            if (ModelState.IsValid)
+            User person = Db.Users.FirstOrDefault(p => p.Id == value.PersonId);
+            if (person != null)
             {
-                User person = Db.Users.FirstOrDefault(p => p.Id == value.PersonId);
-                if (person != null)
-                {
-                    var money = Db.MoneyForEveryone.FirstOrDefault(m => m.PersonId == value.PersonId);
-                    if (money == null)
-                        Db.MoneyForEveryone.Add(value);
-                    else
-                        money.Paid += value.Paid;
-                    Db.SaveChanges();
+                var money = Db.MoneyForEveryone.FirstOrDefault(m => m.PersonId == value.PersonId);
+                if (money == null)
+                    Db.MoneyForEveryone.Add(value);
+                else
+                    money.Paid += value.Paid;
+                Db.SaveChanges();
 
-                    UpdateDb.UpdateMoneyForEveryone(Db);
-                    return RedirectToAction("Result");
-                }
+                UpdateDb.UpdateMoneyForEveryone(Db);
+                return RedirectToAction("Result");
             }
-            ViewBag.Names = Db.Users.Select(p => new NameAndId { Id = p.Id, Name = p.UserName }).ToList();
-            return View(value);
         }
+        ViewBag.Names = Db.Users.Select(p => new NameAndId { Id = p.Id, Name = p.UserName }).ToList();
+        return View(value);
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace Budget.Models.ViewModel
+﻿namespace Budget.Models.ViewModel;
+
+public class NameAndId
 {
-    public class NameAndId
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-    }
+    public string Id { get; set; }
+    public string Name { get; set; }
 }

@@ -4,70 +4,69 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace Budget.Controllers
+namespace Budget.Controllers;
+
+public class AccountController : Controller
 {
-    public class AccountController : Controller
+    public UserManager<User>  UserManager { get; set; }
+    public SignInManager<User> SignInManager { get; set; }
+
+    public AccountController(UserManager<User> userManager, 
+        SignInManager<User> signInManager)
     {
-        public UserManager<User>  UserManager { get; set; }
-        public SignInManager<User> SignInManager { get; set; }
+        UserManager = userManager;
+        SignInManager = signInManager;
+    }
+    IActionResult DefaultRedirect()
+      => RedirectToAction("Index", "Home");
 
-        public AccountController(UserManager<User> userManager, 
-            SignInManager<User> signInManager)
+    [HttpGet]
+    public IActionResult Register() => View();
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterModel model)
+    {
+        if(ModelState.IsValid)
         {
-            UserManager = userManager;
-            SignInManager = signInManager;
-        }
-        IActionResult DefaultRedirect()
-          => RedirectToAction("Index", "Home");
+            User user = new User();
+            user.Email = model.Email;
+            user.UserName = model.Name;
 
-        [HttpGet]
-        public IActionResult Register() => View();
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterModel model)
-        {
-            if(ModelState.IsValid)
+            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
             {
-                User user = new User();
-                user.Email = model.Email;
-                user.UserName = model.Name;
-
-                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await SignInManager.SignInAsync(user, model.RememberMe);
-                    return DefaultRedirect();
-                }
-                else
-                    foreach (IdentityError error in result.Errors)
-                        ModelState.AddModelError(string.Empty, error.Description);
+                await SignInManager.SignInAsync(user, model.RememberMe);
+                return DefaultRedirect();
             }
-            return View(model);
+            else
+                foreach (IdentityError error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
         }
+        return View(model);
+    }
 
 
-        [HttpGet]
-        public IActionResult Login() => View();
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginModel model)
+    [HttpGet]
+    public IActionResult Login() => View();
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginModel model)
+    {
+        if(ModelState.IsValid)
         {
-            if(ModelState.IsValid)
-            {
-                string name = model.Name;
-                var result = await SignInManager.PasswordSignInAsync(name,
-                    model.Password, model.RememberMe, false);
-                if (result.Succeeded)
-                    return DefaultRedirect();
-                else
-                    ModelState.AddModelError(string.Empty, "Неверный пароль или(и) логин");
-            }
-            return View(model);
+            string name = model.Name;
+            var result = await SignInManager.PasswordSignInAsync(name,
+                model.Password, model.RememberMe, false);
+            if (result.Succeeded)
+                return DefaultRedirect();
+            else
+                ModelState.AddModelError(string.Empty, "Неверный пароль или(и) логин");
         }
+        return View(model);
+    }
 
-        [HttpGet]
-        public async Task<IActionResult> Logout()
-        {
-            await SignInManager.SignOutAsync();
-            return RedirectToAction("Login");
-        }
+    [HttpGet]
+    public async Task<IActionResult> Logout()
+    {
+        await SignInManager.SignOutAsync();
+        return RedirectToAction("Login");
     }
 }

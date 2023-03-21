@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Budget.Models
+namespace Budget.Models;
+
+[Table("GetMoney")]
+public class GetMoney : OperationsWithMoney
 {
-    [Table("GetMoney")]
-    public class GetMoney : OperationsWithMoney
-    {
-    }
 }

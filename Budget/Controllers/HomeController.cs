@@ -9,12 +9,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Budget.Controllers
+namespace Budget.Controllers;
+
+[Authorize]
+public class HomeController : Controller
 {
-    [Authorize]
-    public class HomeController : Controller
-    {
-        public IActionResult Index()
-            => View();
-    }
+    public IActionResult Index()
+        => View();
 }

@@ -9,27 +9,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Budget
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            IHost host = CreateHostBuilder(args).Build();
-            using(IServiceScope scope = host.Services.CreateScope())
-            {
-                IServiceProvider service = scope.ServiceProvider;
-                BudgetContext context = service.GetRequiredService<BudgetContext>();
-                StartDb.Initialize(context);
-                host.Run();
-            }
-        }
+namespace Budget;
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        IHost host = CreateHostBuilder(args).Build();
+        using(IServiceScope scope = host.Services.CreateScope())
+        {
+            IServiceProvider service = scope.ServiceProvider;
+            BudgetContext context = service.GetRequiredService<BudgetContext>();
+            StartDb.Initialize(context);
+            host.Run();
+        }
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
 }
