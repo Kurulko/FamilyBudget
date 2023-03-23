@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Budget.Models;
+namespace Budget.Models.Database;
 
 public class BudgetContext : IdentityDbContext<User>
 {
-    public DbSet<OperationsWithMoney> OperationsWithMoney { get; set; }
-    public DbSet<GetMoney> GetMoney { get; set; }
-    public DbSet<SpendMoney> SpendMoney { get; set; }
-    public DbSet<MoneyForEveryone> MoneyForEveryone { get; set; }
+    public DbSet<Money> Money { get; set; } = null!;
+    public DbSet<Currency> Currencies { get; set; } = null!;
+    public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<Operation> Operations { get; set; } = null!;
 
     public BudgetContext(DbContextOptions<BudgetContext> options) : base(options)
         => Database.EnsureCreated();

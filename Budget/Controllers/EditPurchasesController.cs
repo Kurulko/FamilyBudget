@@ -1,4 +1,4 @@
-﻿using Budget.Models;
+﻿using Budget.Models.Database;
 using Budget.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,36 +9,29 @@ using System.Linq;
 
 namespace Budget.Controllers;
 
-[Authorize]
-public class EditPurchasesController : Controller
+public class EditPurchasesController : EditController<SpendMoney, int>
 {
-    public BudgetContext Db { get; set; }
-    public UserManager<User> UserManager { get; set; }
 
-    public EditPurchasesController(BudgetContext context,
-        UserManager<User> userManager)
-    {
-        Db = context;
-        UserManager = userManager;
-    }
+    public EditPurchasesController(BudgetContext db,
+        UserManager<User> userManager) : base(userManager, db) { }
 
 
     [HttpGet]
-    public IActionResult Add()
+    public override IActionResult Add()
     {
-        string personId = UserManager.GetUserId(User);
-        User person = Db.Users.FirstOrDefault(p => p.Id == personId);
+        string personId = userManager.GetUserId(User);
+        User person = db.Users.FirstOrDefault(p => p.Id == personId);
         if (person != null)
             return View(new SpendMoney() { Money = 0.0m, Time = DateTime.Now });
         return RedirectToAction("ListOfPeople", "People");
     }
     [HttpPost]
-    public IActionResult Add(SpendMoney nowPurchase)
+    public override IActionResult Add(SpendMoney nowPurchase)
     {
         if (ModelState.IsValid)
         {
-            string personId = UserManager.GetUserId(User);
-            User person = Db.Users.Include(p => p.Spend)
+            string personId = userManager.GetUserId(User);
+            User person = db.Users.Include(p => p.Spend)
                 .Include(p => p.Spend)
                 .FirstOrDefault(p => p.Id == personId);
             if (person != null)
@@ -54,9 +47,9 @@ public class EditPurchasesController : Controller
                         decimal nowMoney = person.NowMoneyInCash - nowPurchase.Money;
                         lastPurchase.WasMoney = $"{person.NowMoneyInCash} - {lastPurchase.Money} = {nowMoney}";
                         person.NowMoneyInCash = nowMoney;
-                        Db.SaveChanges();
+                        db.SaveChanges();
 
-                        SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                        SumOfMoney.SumOfMoneyThisPerson(db, person);
                         return RedirectToAction("Purchases", "Person", new { id = nowPurchase.PersonId });
                     }
                     else
@@ -73,9 +66,9 @@ public class EditPurchasesController : Controller
                         decimal nowMoney = person.NowMoneyInCart - nowPurchase.Money;
                         lastPurchase.WasMoney = $"{person.NowMoneyInCart} - {lastPurchase.Money} = {nowMoney}";
                         person.NowMoneyInCart = nowMoney;
-                        Db.SaveChanges();
+                        db.SaveChanges();
 
-                        SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                        SumOfMoney.SumOfMoneyThisPerson(db, person);
                         return RedirectToAction("Purchases", "Person");
                     }
                     else
@@ -87,10 +80,10 @@ public class EditPurchasesController : Controller
     }
 
     [HttpGet]
-    public IActionResult Edit(int purchaseId)
+    public override IActionResult Edit(int purchaseId)
     {
-        string personId = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Spend)
+        string personId = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Spend)
             .FirstOrDefault(p => p.Id == personId);
         if (person != null)
         {
@@ -102,12 +95,12 @@ public class EditPurchasesController : Controller
         return RedirectToAction("ListOfPeople", "People");
     }
     [HttpPost]
-    public IActionResult Edit(SpendMoney nowPurchase)
+    public override IActionResult Edit(SpendMoney nowPurchase)
     {
         if (ModelState.IsValid)
         {
-            string personId = UserManager.GetUserId(User);
-            User person = Db.Users.Include(p => p.Spend)
+            string personId = userManager.GetUserId(User);
+            User person = db.Users.Include(p => p.Spend)
                 .FirstOrDefault(p => p.Id == personId);
             if (person != null)
             {
@@ -131,9 +124,9 @@ public class EditPurchasesController : Controller
                                 wasPurchase.Time = nowPurchase.Time;
 
                                 person.NowMoneyInCash = nowMoney;
-                                Db.SaveChanges();
+                                db.SaveChanges();
 
-                                SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                                SumOfMoney.SumOfMoneyThisPerson(db, person);
                                 return RedirectToAction("Purchases", "Person", new { id = nowPurchase.PersonId });
                             }
                             else
@@ -156,9 +149,9 @@ public class EditPurchasesController : Controller
 
                                 person.NowMoneyInCart = nowMoneyInCart;
                                 person.NowMoneyInCash = nowMoneyInCash;
-                                Db.SaveChanges();
+                                db.SaveChanges();
 
-                                SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                                SumOfMoney.SumOfMoneyThisPerson(db, person);
                                 return RedirectToAction("Purchases", "Person");
                             }
                             else
@@ -182,9 +175,9 @@ public class EditPurchasesController : Controller
                                 wasPurchase.Time = nowPurchase.Time;
 
                                 person.NowMoneyInCart = nowMoney;
-                                Db.SaveChanges();
+                                db.SaveChanges();
 
-                                SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                                SumOfMoney.SumOfMoneyThisPerson(db, person);
                                 return RedirectToAction("Purchases", "Person");
                             }
                             else
@@ -207,9 +200,9 @@ public class EditPurchasesController : Controller
 
                                 person.NowMoneyInCart = nowMoneyInCart;
                                 person.NowMoneyInCash = nowMoneyInCash;
-                                Db.SaveChanges();
+                                db.SaveChanges();
 
-                                SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                                SumOfMoney.SumOfMoneyThisPerson(db, person);
                                 return RedirectToAction("Purchases", "Person");
                             }
                             else
@@ -226,23 +219,23 @@ public class EditPurchasesController : Controller
 
 
     [HttpGet]
-    public IActionResult Delete(int purchaseId)
+    public override IActionResult Delete(int purchaseId)
     {
-        string personId = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Spend)
+        string personId = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Spend)
             .FirstOrDefault(p => p.Id == personId);
         if (person != null)
         {
             SpendMoney purchase = person.Spend.FirstOrDefault(p => p.Id == purchaseId);
             if (purchase != null)
             {
-                Db.SpendMoney.Remove(purchase);
+                db.SpendMoney.Remove(purchase);
                 if (purchase.IsCash)
                     person.NowMoneyInCash += purchase.Money;
                 else
                     person.NowMoneyInCart += purchase.Money;
-                Db.SaveChanges();
-                SumOfMoney.SumOfMoneyThisPerson(Db, person);
+                db.SaveChanges();
+                SumOfMoney.SumOfMoneyThisPerson(db, person);
                 return RedirectToAction("Purchases", "Person");
             }
         }

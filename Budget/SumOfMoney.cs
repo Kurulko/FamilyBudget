@@ -1,4 +1,4 @@
-﻿using Budget.Models;
+﻿using Budget.Models.Database;
 using System.Collections.Generic;
 
 namespace Budget;

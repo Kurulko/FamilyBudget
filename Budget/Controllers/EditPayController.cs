@@ -1,44 +1,28 @@
-﻿using Budget.Models;
+﻿using Budget.Models.Database;
 using Budget.Models.ViewModel;
+using Budget.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Budget.Controllers;
 
-[Authorize]
-public class EditPayController : Controller
+public class EditPayController : EditController<Operation, long>
 {
-    public BudgetContext Db { get; set; }
-    public UserManager<User> UserManager { get; set; }
+    public EditPayController(IUserService userService, BudgetContext db) : base(userService, db) { }
 
-    public EditPayController(BudgetContext context,
-        UserManager<User> userManager)
-    {
-        Db = context;
-        UserManager = userManager;
-    }
+    public override Task<IActionResult> AddAsync()
+        => Task.FromResult(View(new  GetMoney() { Money = 0.0m, Time = DateTime.Now }));
 
-    [HttpGet]
-    public IActionResult Add()
-    {
-        string personId = UserManager.GetUserId(User);
-        User person = Db.Users.FirstOrDefault(p => p.Id == personId);
-        if (person != null)
-            return View(new  GetMoney() { Money = 0.0m, Time = DateTime.Now });
-        return RedirectToAction("Person", "Person");
-    }
-    [HttpPost]
-    public IActionResult Add(GetMoney getMoney)
+    public override async Task<IActionResult> AddAsync(Operation operation)
     {
         if (ModelState.IsValid)
         {
-            string personId = UserManager.GetUserId(User);
-            User person = Db.Users.Include(p => p.Get)
-                .FirstOrDefault(p => p.Id == personId);
+            User person = (await userService.GetUserByClaimsAsync(User))!;
             if (person != null)
             {
                 person.Get.Add(getMoney);
@@ -47,18 +31,17 @@ public class EditPayController : Controller
                 else
                     person.NowMoneyInCart += getMoney.Money;
 
-                Db.SaveChanges();
+                db.SaveChanges();
                 return RedirectToAction("Pay", "Person");
             }
         }
         return View(getMoney);
     }
 
-    [HttpGet]
-    public IActionResult Edit(int getId)
+    public override async Task<IActionResult> EditAsync(long id)
     {
-        string personId = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Get)
+        string personId = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Get)
             .FirstOrDefault(p => p.Id == personId);
         if (person != null)
         {
@@ -69,13 +52,12 @@ public class EditPayController : Controller
         }
         return RedirectToAction("Person", "Person");
     }
-    [HttpPost]
-    public IActionResult Edit(GetMoney wasGetMoney)
+    public override async Task<IActionResult> EditAsync(GetMoney wasGetMoney)
     {
         if (ModelState.IsValid)
         {
-            string personId = UserManager.GetUserId(User);
-            User person = Db.Users.Include(p => p.Get)
+            string personId = userManager.GetUserId(User);
+            User person = db.Users.Include(p => p.Get)
                 .FirstOrDefault(p => p.Id == personId);
             if (person != null)
             {
@@ -108,7 +90,7 @@ public class EditPayController : Controller
                     get.Time = wasGetMoney.Time;
                     get.IsCash = wasGetMoney.IsCash;
 
-                    Db.SaveChanges();
+                    db.SaveChanges();
                     return RedirectToAction("Pay", "Person");
                 }
             }
@@ -117,24 +99,23 @@ public class EditPayController : Controller
     }
 
 
-    [HttpGet]
-    public IActionResult Delete(int getId)
+    public override async Task<IActionResult> DeleteAsync(long id)
     {
-        string personId = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Get)
+        string personId = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Get)
             .FirstOrDefault(p => p.Id == personId);
         if (person != null)
         {
             GetMoney get = person.Get.FirstOrDefault(p => p.Id == getId);
             if (get != null)
             {
-                Db.GetMoney.Remove(get);
+                db.GetMoney.Remove(get);
                 if (get.IsCash)
                     person.NowMoneyInCash -= get.Money;
                 else
                     person.NowMoneyInCart -= get.Money;
 
-                Db.SaveChanges();
+                db.SaveChanges();
                 return RedirectToAction("Pay", "Person");
             }
         }

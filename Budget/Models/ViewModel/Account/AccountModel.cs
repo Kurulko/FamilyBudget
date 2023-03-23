@@ -1,17 +1,19 @@
 ﻿using Budget.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
-namespace Budget.Models.ViewModel;
+namespace Budget.Models.ViewModel.Account;
 
-public class LoginModel
+public class AccountModel
 {
     [RequiredEnter]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [RequiredEnter]
     [DataType(DataType.Password)]
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 
     [Display(Name = "Remember me?")]
     public bool RememberMe { get; set; }
+
 }

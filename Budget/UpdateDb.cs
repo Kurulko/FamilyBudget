@@ -1,10 +1,10 @@
-﻿using Budget.Models;
+﻿using Budget.Models.Database;
 using System;
 using System.Linq;
 
 namespace Budget;
 
-public class UpdateDb
+public class Updatedb
 {
     public static void UpdateMoneyForEveryone(BudgetContext db)
     {

@@ -340,14 +340,14 @@ $.extend( $.validator, {
 		},
 		highlight: function( element, errorClass, validClass ) {
 			if ( element.type === "radio" ) {
-				this.findByName( element.name ).addClass( errorClass ).removeClass( validClass );
+				this.findbyName( element.name ).addClass( errorClass ).removeClass( validClass );
 			} else {
 				$( element ).addClass( errorClass ).removeClass( validClass );
 			}
 		},
 		unhighlight: function( element, errorClass, validClass ) {
 			if ( element.type === "radio" ) {
-				this.findByName( element.name ).removeClass( errorClass ).addClass( validClass );
+				this.findbyName( element.name ).removeClass( errorClass ).addClass( validClass );
 			} else {
 				$( element ).removeClass( errorClass ).addClass( validClass );
 			}
@@ -480,7 +480,7 @@ $.extend( $.validator, {
 				if ( group ) {
 					$.each( this.groups, function( name, testgroup ) {
 						if ( testgroup === group && name !== checkElement.name ) {
-							cleanElement = v.validationTargetFor( v.clean( v.findByName( name ) ) );
+							cleanElement = v.validationTargetFor( v.clean( v.findbyName( name ) ) );
 							if ( cleanElement && cleanElement.name in v.invalid ) {
 								v.currentElements.push( cleanElement );
 								result = v.check( cleanElement ) && result;
@@ -521,7 +521,7 @@ $.extend( $.validator, {
 				this.errorList = $.map( this.errorMap, function( message, name ) {
 					return {
 						message: message,
-						element: validator.findByName( name )[ 0 ]
+						element: validator.findbyName( name )[ 0 ]
 					};
 				} );
 
@@ -560,7 +560,7 @@ $.extend( $.validator, {
 				for ( i = 0; elements[ i ]; i++ ) {
 					this.settings.unhighlight.call( this, elements[ i ],
 						this.settings.errorClass, "" );
-					this.findByName( elements[ i ].name ).removeClass( this.settings.validClass );
+					this.findbyName( elements[ i ].name ).removeClass( this.settings.validClass );
 				}
 			} else {
 				elements
@@ -697,7 +697,7 @@ $.extend( $.validator, {
 				val, idx;
 
 			if ( type === "radio" || type === "checkbox" ) {
-				return this.findByName( element.name ).filter( ":checked" ).val();
+				return this.findbyName( element.name ).filter( ":checked" ).val();
 			} else if ( type === "number" && typeof element.validity !== "undefined" ) {
 				return element.validity.badInput ? "NaN" : $element.val();
 			}
@@ -931,7 +931,7 @@ $.extend( $.validator, {
 			var place, group, errorID, v,
 				error = this.errorsFor( element ),
 				elementID = this.idOrName( element ),
-				describedBy = $( element ).attr( "aria-describedby" );
+				describedby = $( element ).attr( "aria-describedby" );
 
 			if ( error.length ) {
 
@@ -976,14 +976,14 @@ $.extend( $.validator, {
 					errorID = error.attr( "id" );
 
 					// Respect existing non-error aria-describedby
-					if ( !describedBy ) {
-						describedBy = errorID;
-					} else if ( !describedBy.match( new RegExp( "\\b" + this.escapeCssMeta( errorID ) + "\\b" ) ) ) {
+					if ( !describedby ) {
+						describedby = errorID;
+					} else if ( !describedby.match( new RegExp( "\\b" + this.escapeCssMeta( errorID ) + "\\b" ) ) ) {
 
 						// Add to end of list if not already present
-						describedBy += " " + errorID;
+						describedby += " " + errorID;
 					}
-					$( element ).attr( "aria-describedby", describedBy );
+					$( element ).attr( "aria-describedby", describedby );
 
 					// If this element is grouped, then assign to all elements in the same group
 					group = this.groups[ element.name ];
@@ -1040,7 +1040,7 @@ $.extend( $.validator, {
 
 			// If radio/checkbox, validate first element in group instead
 			if ( this.checkable( element ) ) {
-				element = this.findByName( element.name );
+				element = this.findbyName( element.name );
 			}
 
 			// Always apply ignore filter
@@ -1051,7 +1051,7 @@ $.extend( $.validator, {
 			return ( /radio|checkbox/i ).test( element.type );
 		},
 
-		findByName: function( name ) {
+		findbyName: function( name ) {
 			return $( this.currentForm ).find( "[name='" + this.escapeCssMeta( name ) + "']" );
 		},
 
@@ -1061,7 +1061,7 @@ $.extend( $.validator, {
 				return $( "option:selected", element ).length;
 			case "input":
 				if ( this.checkable( element ) ) {
-					return this.findByName( element.name ).filter( ":checked" ).length;
+					return this.findbyName( element.name ).filter( ":checked" ).length;
 				}
 			}
 			return value.length;

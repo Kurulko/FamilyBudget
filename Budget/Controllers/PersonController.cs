@@ -1,5 +1,6 @@
-﻿using Budget.Models;
+﻿using Budget.Models.Database;
 using Budget.Models.ViewModel;
+using Budget.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,22 +11,16 @@ using System.Linq;
 namespace Budget.Controllers;
 
 [Authorize]
-public class PersonController : Controller
+public class PersonController : BudgetController
 {
-    public BudgetContext Db { get; set; }
-    public UserManager<User> UserManager { get; set; }
-
-    public PersonController(BudgetContext context,
-        UserManager<User> userManager)
-    {
-        Db = context;
-        UserManager = userManager;
-    }
+    readonly BudgetContext db;
+    public PersonController(IUserService userService, BudgetContext db) : base(userService)
+        => this.db = db;
 
     public IActionResult Person()
     {
-        string id = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Spend)
+        string id = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Spend)
             .FirstOrDefault(p => p.Id == id);
         if (person != null)
             return View(person.UserName as object);
@@ -34,10 +29,10 @@ public class PersonController : Controller
 
     public IActionResult Purchases()
     {
-        string id = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Spend)
+        string id = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Spend)
             .FirstOrDefault(p => p.Id == id);
-        Db.SaveChanges();
+        db.SaveChanges();
         if (person != null)
             return View(person);
         return RedirectToAction("Index", "Home");
@@ -45,8 +40,8 @@ public class PersonController : Controller
 
     public IActionResult Pay()
     {
-        string id = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Get)
+        string id = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Get)
             .Include(p => p.Spend)
             .FirstOrDefault(p => p.Id == id);
         if (person != null)
@@ -56,8 +51,8 @@ public class PersonController : Controller
 
     public IActionResult Compare()
     {
-        string id = UserManager.GetUserId(User);
-        User person = Db.Users.Include(p => p.Get)
+        string id = userManager.GetUserId(User);
+        User person = db.Users.Include(p => p.Get)
             .Include(p => p.Spend)
             .FirstOrDefault(p => p.Id == id);
         if (person != null)
