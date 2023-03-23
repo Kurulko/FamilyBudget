@@ -1,5 +1,5 @@
 ﻿using Budget.Models;
-using Budget.Services.Users;
+using Budget.Services.Db.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ namespace Budget.Controllers;
 [Authorize]
 public abstract class BudgetController : MainController
 {
-    protected readonly IUserService userService;
-    public BudgetController(IUserService userService)
+    protected readonly AbsUserService userService;
+    public BudgetController(AbsUserService userService)
         => this.userService = userService;
 }

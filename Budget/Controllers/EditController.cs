@@ -1,5 +1,6 @@
 ﻿using Budget.Models.Database;
-using Budget.Services.Users;
+using Budget.Services.Db;
+using Budget.Services.Db.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,11 @@ using System.Threading.Tasks;
 namespace Budget.Controllers;
 
 [Authorize]
-public abstract class EditController<TModel, TId> : BudgetController
+public abstract class EditController<TModel, TId> : BudgetController where TModel : class
 {
-    protected readonly BudgetContext db;
-    public EditController(IUserService userService, BudgetContext db) : base(userService)
-        => this.db = db;
+    protected readonly Service<TModel, TId> dbService;
+    public EditController(AbsUserService userService, Service<TModel, TId> dbService) : base(userService)
+        => this.dbService = dbService;
 
 
     [HttpGet, ActionName("Add")]
