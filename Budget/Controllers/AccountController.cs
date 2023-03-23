@@ -34,7 +34,7 @@ public class AccountController : Controller
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                await SignInManager.SignInAsync(user, model.RememberMe);
+                await SignInManager.SignInAsync(user, model.IsRememberMe);
                 return DefaultRedirect();
             }
             else
