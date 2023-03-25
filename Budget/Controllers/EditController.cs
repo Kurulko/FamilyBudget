@@ -4,6 +4,7 @@ using Budget.Services.Db.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Budget.Controllers;
@@ -19,13 +20,27 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
     [HttpGet, ActionName("Add")]
     public abstract Task<IActionResult> AddAsync();
     [HttpPost, ActionName("Add")]
-    public abstract Task<IActionResult> AddAsync(TModel model);
+    public Task<IActionResult> AddAsync(TModel model)
+        => DoActionIfValid(AddAsyncIfValid, model);
+
+    protected abstract Task<IActionResult> AddAsyncIfValid(TModel model);
+
 
     [HttpGet, ActionName("Edit")]
     public abstract Task<IActionResult> EditAsync(TId modelId);
     [HttpPost, ActionName("Edit")]
-    public abstract Task<IActionResult> EditAsync(TModel model);
+    public Task<IActionResult> EditAsync(TModel model)
+        => DoActionIfValid(EditAsyncIfValid, model);
+    
+    protected abstract Task<IActionResult> EditAsyncIfValid(TModel model);
+
 
     [HttpGet, ActionName("Delete")]
     public abstract Task<IActionResult> DeleteAsync(TId modelId);
+
+    Task<IActionResult> DoActionIfValid(Func<TModel, Task<IActionResult>> action, TModel model)
+        => ModelState.IsValid ? action(model) : GetActionResultAsync(View(model));
+
+    protected Task<IActionResult> GetActionResultAsync(IActionResult actionResult)
+        => Task.FromResult(actionResult);
 }

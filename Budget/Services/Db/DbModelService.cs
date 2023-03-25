@@ -8,7 +8,7 @@ public abstract class DbModelService<TModel> : Service<TModel, long> where TMode
 {
     public DbModelService(BudgetContext db) : base(db) { }
 
-    public override void DeleteModel(long id)
+    public override void DeleteModelById(long id)
     {
         models.Remove(new() { Id = id });
         SaveChanges();

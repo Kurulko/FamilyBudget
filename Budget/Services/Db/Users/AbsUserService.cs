@@ -10,7 +10,7 @@ public abstract class AbsUserService : Service<User, string>
     public AbsUserService(BudgetContext db) : base(db) { }
 
     protected override DbSet<User> models => db.Users;
-    public override void DeleteModel(string id)
+    public override void DeleteModelById(string id)
     {
         models.Remove(new() { Id = id });
         SaveChanges();

@@ -4,6 +4,7 @@ using Budget.Services.Db;
 using Budget.Services.Db.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +22,7 @@ string connection = config.GetConnectionString("DefaultConnection");
 services.AddDbContext<BudgetContext>(opts => opts.UseSqlServer(connection));
 
 services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<BudgetContext>();
-services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new PathString("/Account/Register"));
 
 services.AddScoped<IAccountService, AccountService>();
 services.AddScoped<AbsUserService, UserService>();

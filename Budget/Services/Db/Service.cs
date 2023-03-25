@@ -22,7 +22,7 @@ public abstract class Service<TModel, TId> where TModel : class
         SaveChanges();
     }
 
-    public abstract void DeleteModel(TId id);
+    public abstract void DeleteModelById(TId id);
     public abstract Task<TModel?> GetModelByIdAsync(TId id);
 
     protected virtual void SaveChanges()
