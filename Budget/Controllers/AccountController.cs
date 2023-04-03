@@ -13,9 +13,9 @@ public class AccountController : MainController
     public AccountController(IAccountService accountService)
         => this.accountService = accountService;
 
-
     [HttpGet]
     public IActionResult Register() => View();
+
     [HttpPost]
     public async Task<IActionResult> Register(RegisterModel model)
     {
@@ -35,6 +35,7 @@ public class AccountController : MainController
 
     [HttpGet]
     public IActionResult Login() => View();
+
     [HttpPost]
     public async Task<IActionResult> Login(LoginModel model)
     {

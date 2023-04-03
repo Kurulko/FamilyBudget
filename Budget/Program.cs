@@ -32,7 +32,7 @@ services.AddScoped<DbModelService<Category>, CategoryService>();
 services.AddScoped<DbModelService<Currency>, CurrencyService>();
 
 services.AddControllers().AddNewtonsoftJson();
-//services.AddSwaggerGen();
+services.AddSwaggerGen();
 services.AddRazorPages();
 
 
@@ -41,8 +41,8 @@ WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseHsts();
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -55,18 +55,19 @@ app.UseRouting();
 //{
 //    IServiceProvider serviceProvider = serviceScope.ServiceProvider;
 
-//    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-//    await RoleInitializer.InitializeAsync(roleManager);
+//    //var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//    //await RoleInitializer.InitializeAsync(roleManager);
 
-//    string adminName = config.GetValue<string>("Admin:Name");
-//    string adminPassword = config.GetValue<string>("Admin:Password");
-//    var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-//    await UsersInitializer.AdminInitializeAsync(userManager, adminName, adminPassword);
+//    //string adminName = config.GetValue<string>("Admin:Name");
+//    //string adminPassword = config.GetValue<string>("Admin:Password");
+//    //var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+//    //await UsersInitializer.AdminInitializeAsync(userManager, adminName, adminPassword);
 //}
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
 
 app.Run();
+

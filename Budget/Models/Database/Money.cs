@@ -8,6 +8,6 @@ public class Money : DbModel
 
     public long CurrencyId { get; set; }
     public Currency? Currency { get; set; }
-    public long PurchaseId { get; set; }
+    public long OperationId { get; set; }
     public Operation? Operation { get; set; }
 }

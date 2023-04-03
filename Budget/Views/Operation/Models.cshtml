@@ -1,19 +1,19 @@
-﻿@using System.Linq
-@model GetAndPerson
+﻿@model IEnumerable<Operation>
 @{
-    ViewBag.Back = $"/Person/Person";
-    ViewBag.Title = "Получение";
+    ViewBag.Title = "Operations";
 }
+
+
 <h5>
     <em>
-        Кол-во денег на данный момент:<br />
+        Count of money at the current moment:<br />
     </em>
 </h5>
-<h6>
+@*<h6>
     <em>
-        На карте: @Model.User.NowMoneyInCart
+        On card: @Model.User.NowMoneyInCart
         <br />
-        Наличными: @Model.User.NowMoneyInCash
+        Cash: @Model.User.NowMoneyInCash
     </em>
 </h6>
 
@@ -58,13 +58,13 @@
                 <td>@(get.IsCash ? "Наличными" : "Картой")</td>
                 <td>
                     <a asp-controller="EditPay" asp-action="Edit" class="btn btn-outline-info"
-                         asp-route-getId=@get.Id>
+               asp-route-getId=@get.Id>
                         <em>Изменить</em>
                     </a>
                 </td>
                 <td>
                     <a asp-controller="EditPay" asp-action="Delete" class="btn btn-outline-danger"
-                        asp-route-getId=@get.Id>
+               asp-route-getId=@get.Id>
                         <em>Удалить</em>
                     </a>
                 </td>
@@ -91,9 +91,9 @@
                 }
 
             }
-            <td>@( cart == 0 ? " " : cart.ToString())</td>
-            <td>@( cash == 0 ? " " : cash.ToString())</td>
+            <td>@(cart == 0 ? " " : cart.ToString())</td>
+            <td>@(cash == 0 ? " " : cash.ToString())</td>
         </tr>
     </table>
 
-}
+}*@

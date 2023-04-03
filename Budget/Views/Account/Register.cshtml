@@ -1,10 +1,10 @@
 ﻿@model RegisterModel
 @{
-    string title = "Регистрация";
+    string title = AcсountModes.Register;
     ViewBag.Title = title;
 }
 @section Link{
-<a asp-action="Login" asp-controller="Account" class="btn btn-outline-primary">Войти</a>
+    <a asp-action="Login" asp-controller="Account" class="btn btn-outline-primary">@AcсountModes.Login</a>
 }
 
 <form method="post" class="form-group">
@@ -26,9 +26,9 @@
     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     <input asp-for="ConfirmPassword" class="form-control my_input"/>
     <br />
-    <label asp-for="RememberMe"></label>
-    <span asp-validation-for="RememberMe" class="text-danger"></span>
-    <input asp-for="RememberMe" class="form-control my_input"/>
+    <label asp-for="IsRememberMe"></label>
+    <span asp-validation-for="IsRememberMe" class="text-danger"></span>
+    <input asp-for="IsRememberMe" class="form-control my_input" />
     <br />
     <input type="submit" value=@title class="btn btn-outline-primary" />
 </form>

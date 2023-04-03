@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Budget.Controllers;
+namespace Budget.Controllers.DB;
 
 [Authorize]
 public abstract class BudgetController : MainController

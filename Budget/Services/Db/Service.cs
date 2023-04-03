@@ -1,5 +1,7 @@
 ﻿using Budget.Models.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Budget.Services.Db;
@@ -10,6 +12,9 @@ public abstract class Service<TModel, TId> where TModel : class
     public Service(BudgetContext db)
         => this.db = db;
     protected abstract DbSet<TModel> models { get; }
+
+    public virtual async Task<IEnumerable<TModel>> GetModelsAsync()
+        => await models.ToListAsync();
 
     public virtual async Task AddModelAsync(TModel model)
     {
