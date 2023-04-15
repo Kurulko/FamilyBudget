@@ -1,0 +1,78 @@
+﻿@model ModelWithMode<Operation>
+
+@{
+    ViewBag.Title = "Operation";
+    Mode mode = Model.Mode;
+    Operation? operation = Model.Model;
+
+    string color = ModeHelper.GetBootstrapColorByMode(mode);
+
+    FormModel formModel = new() { Href = $"/operations/{operation.TypeOfOperation.ToString().ToLower()}/models/{mode.ToString().ToLower()}", Mode = mode };
+    Model.Model.Money = new();
+    string userId = operation.UserId!;
+    ModelWithMode<Category> categoryWithMode = new(operation?.Category ?? new() { UserId = userId }, mode);
+    ModelWithMode<Money> moneyWithMode = new(operation?.Money ?? new() { UserId = userId }, mode);
+    ModelWithMode<Currency> currencyWithMode = new(operation?.Money?.Currency ?? new() { UserId = userId }, mode);
+}
+
+@section BelowHeader {
+    <h3 class="text-secondary">Operation</h3>
+    <hr />
+    <h3 class="text-@color">@mode</h3>
+    <br />
+    @if (mode != Mode.Add)
+    {
+        @if (mode != Mode.Edit)
+        {
+            <a href="@($"models/edit/{operation!.Id}")"
+               class="btn btn-outline-warning">
+                <em>Edit</em>
+            </a>
+        }
+        <a href="@($"models/delete/{operation!.Id}")"
+           class="btn btn-outline-danger">
+            <em>Delete</em>
+        </a>
+    }
+}
+
+<br />
+<br />
+<form-validation form-model="@formModel" >
+    <section name="Operation">
+        <partial name="_OperationEdit" for="@Model" />
+    </section>
+
+    <section name="Category">
+        <select asp-for="Model!.CategoryId" asp-items="ViewBag.Categories" class="form-control text-center" style="width:50%;"></select>
+    </section>
+
+    <section name="Money">
+        <model-details for="Model.Money!.Count">
+            <input asp-for="Model.Money!.Count" class="form-control text-center"/>
+            <p><span asp-validation-for="Model.Money!.Count" class="text-danger"></span></p>
+        </model-details>
+
+        <model-details for="Model.Money!.TypeOfMoney">
+            <select asp-for="Model.Money!.TypeOfMoney" asp-items="Html.GetEnumSelectList<TypeOfMoney>()" class="form-control text-center"></select>
+            <p><span asp-validation-for="Model.Money!.TypeOfMoney" class="text-danger"></span></p>
+        </model-details>
+
+        <input type="hidden" asp-for="Model.Money!.Id" />
+        <input type="hidden" asp-for="Model.Money!.CurrencyId" />
+        <input type="hidden" asp-for="Model.Money!.UserId" />
+    </section>
+@*    <section name="Money">
+        <partial name="_MoneyEdit" for="Model.Money" />
+    </section>
+*@@*    <section name="Money">
+        <partial name="_MoneyEdit" for="@moneyWithMode" />
+    </section>
+*@
+    <section name="Currency">
+        <select asp-for="Model!.Money!.CurrencyId" asp-items="ViewBag.Currencies" class="form-control text-center" style="width:50%;"></select>
+    </section>
+</form-validation>
+
+
+

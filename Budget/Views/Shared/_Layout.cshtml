@@ -6,14 +6,8 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-        /*        header {
-                    min-height: 35px;
-                    background-color: black;
-                    color: white;
-                    text-align: center;
-                }
-        */
         a:hover {
             text-decoration-line: none;
         }
@@ -27,17 +21,12 @@
             font-weight: bold;
         }
 
-        span, label, th, td, input, option, select {
+        span, label, th, td, input, option, select, h4, h3 {
             font-style: oblique;
         }
 
-
         body {
             margin: 0;
-        }
-
-        footer {
-            /*height: 10%;*/
         }
 
         header {
@@ -46,44 +35,28 @@
             align-items: center;
             background-color: #4f2684;
             color: white;
-            /*padding: 0.5%;*/
-            /*height: 5%;*/
+            width: 100%;
         }
 
-        h1 {
-            margin: 0;
-        }
+            header h4 {
+                margin: 0 auto;
+            }
 
         .menu {
-            position: fixed;
             top: 0;
             left: 0;
-            margin-top: 1.9%;
-            height: 89.4%;
-            width: 20%;
+            height: 93.5%;
             background-color: #3a0647;
             color: white;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .menu.open {
-            transform: translateX(0);
         }
 
         .menu ul {
             list-style: none;
             padding: 0;
-            margin: 20px;
         }
 
-        .menu li {
-            margin-bottom: 10px;
-        }
-
-        .menu a {
-            color: white;
-            text-decoration: none;
+        .menu li a {
+            margin-top: 30%;
         }
 
         .menu-toggle {
@@ -96,71 +69,105 @@
             cursor: pointer;
         }
 
-        .close-menu {
-            font-size: 24px;
-            background-color: transparent;
-            border: none;
-            color: white;
-            margin: 20px;
-            padding: 0;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
     <header>
         <button class="menu-toggle">&#9776;</button>
-        <h4>Family Budget</h4>
+        <h4>Personal Budget</h4>
     </header>
 
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2" id="left" hidden>
             <div class="menu">
-                <button class="close-menu">&times;</button>
-                <ul>
-                    <li><a href="#">Item 1</a></li>
-                    <li><a href="#">Item 2</a></li>
-                    <li><a href="#">Item 3</a></li>
-                </ul>
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <ul>
+                            <li>
+                                <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models")"
+                                   class="btn btn-outline-primary">
+                                    <em>Purchases</em>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@($"/operations/{TypeOfOperation.Receiving.ToString().ToLower()}/models")"
+                                   class="btn btn-outline-primary">
+                                    <em>Receiving</em>
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="operations" asp-action="models"
+                                   class="btn btn-outline-primary">
+                                    <em>Compare</em>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-9">
-            <center>
-            <br />
-            @RenderBody()
-            <br />
-            </center>
-        </div>
-
-        <footer class="border-top footer text-muted">
-            <div class="container" style="font-style: oblique;">
-                &copy; 2022 - Family budget
-                @if (User.Identity!.IsAuthenticated)
-                {
-                    <a asp-action="Logout" asp-controller="Account">@AcсountModes.Logout</a>
-                }
-                @RenderSection("Link", required: false)
+        <div class="col-md-12" id="right">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-10">
+                    <br />
+                    @RenderSection("BelowHeader", required: false)
+                    <center>
+                        <br /><br />
+                        @RenderBody()
+                        <br /><br />
+                    </center>
+                </div>
             </div>
-        </footer>
-
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-        @await RenderSectionAsync("Scripts", required: false)
-
+        </div>
     </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container" style="font-style: oblique;">
+            &copy; 2023 - Personal Budget
+            @if (User.Identity!.IsAuthenticated)
+            {
+                <a asp-action="Logout" asp-controller="Account">@AcсountModes.Logout</a>
+            }
+            @RenderSection("Link", required: false)
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
     <script>
         const menuToggle = document.querySelector(".menu-toggle");
-        const closeMenu = document.querySelector(".close-menu");
-        const menu = document.querySelector(".menu");
+        var open = false;
 
-        menuToggle.addEventListener("click", function () {
-            menu.classList.add("open");
+        menuToggle.addEventListener("click", () => {
+            const menu = document.querySelector(".menu");
+            const left = document.getElementById("left");
+            const right = document.getElementById("right");
+
+            open = !open;
+
+            if (open) {
+                right.classList.remove("col-md-12");
+                left.removeAttribute("hidden");
+                left.classList.add("col-md-2");
+                right.classList.add("col-md-10");
+
+                menu.classList.add("open");
+            }
+            else {
+                left.classList.remove("col-md-2");
+                right.classList.remove("col-md-10");
+                left.setAttribute("hidden", "hidden");
+                right.classList.add("col-md-12");
+
+                menu.classList.remove("open");
+            }
         });
 
-        closeMenu.addEventListener("click", function () {
-            menu.classList.remove("open");
-        });
     </script>
 </body>
 </html>

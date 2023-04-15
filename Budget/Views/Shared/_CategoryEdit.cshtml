@@ -1,0 +1,25 @@
+﻿@model ModelWithMode<Category>
+
+@{
+    Mode mode = Model.Mode;
+    bool isEdit = mode == Mode.Edit || mode == Mode.Add;
+}
+
+<model-details for="Model.Name">
+    @if (isEdit)
+    {
+        <input asp-for="Model.Name" class="form-control" />
+        <p><span asp-validation-for="Model.Name" class="text-danger"></span></p>
+    }
+</model-details>
+
+
+@if (mode != Mode.Get)
+{
+    <input type="hidden" asp-for="Model.Id" />
+    <input type="hidden" asp-for="Model.ParentCategoryId" />
+}
+
+
+
+

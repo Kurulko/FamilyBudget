@@ -17,7 +17,7 @@ public class AccountService : IAccountService
     {
         User user = (User)model;
 
-        var result = await signInManager.PasswordSignInAsync(user,
+        var result = await signInManager.PasswordSignInAsync(user.UserName,
             model.Password, model.IsRememberMe, false);
 
         return result.Succeeded;

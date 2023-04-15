@@ -1,3 +1,4 @@
+using Budget.Initializer;
 using Budget.Models.Database;
 using Budget.Services.Account;
 using Budget.Services.Db;
@@ -31,7 +32,7 @@ services.AddScoped<DbModelService<Money>, MoneyService>();
 services.AddScoped<DbModelService<Category>, CategoryService>();
 services.AddScoped<DbModelService<Currency>, CurrencyService>();
 
-services.AddControllers().AddNewtonsoftJson();
+services.AddControllersWithViews().AddNewtonsoftJson();
 services.AddSwaggerGen();
 services.AddRazorPages();
 
@@ -51,18 +52,27 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//using (IServiceScope serviceScope = app.Services.CreateScope())
-//{
-//    IServiceProvider serviceProvider = serviceScope.ServiceProvider;
+using (IServiceScope serviceScope = app.Services.CreateScope())
+{
+    IServiceProvider serviceProvider = serviceScope.ServiceProvider;
 
-//    //var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-//    //await RoleInitializer.InitializeAsync(roleManager);
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleInitializer.InitializeAsync(roleManager);
 
-//    //string adminName = config.GetValue<string>("Admin:Name");
-//    //string adminPassword = config.GetValue<string>("Admin:Password");
-//    //var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-//    //await UsersInitializer.AdminInitializeAsync(userManager, adminName, adminPassword);
-//}
+    string adminName = config.GetValue<string>("Admin:Name");
+    string adminPassword = config.GetValue<string>("Admin:Password");
+    var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+    string? userId = await UsersInitializer.AdminInitializeAsync(userManager, adminName, adminPassword);
+
+    if(userId is not null)
+    {
+        var operationService = serviceProvider.GetRequiredService<DbModelService<Operation>>();
+        var categoryService = serviceProvider.GetRequiredService<DbModelService<Category>>();
+        var moneyService = serviceProvider.GetRequiredService<DbModelService<Money>>();
+        var currencyService = serviceProvider.GetRequiredService<DbModelService<Currency>>();
+        await DataInitializer.InitializeAsync(userId, operationService, categoryService, moneyService, currencyService);
+    }
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

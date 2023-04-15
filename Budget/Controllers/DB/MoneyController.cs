@@ -10,5 +10,8 @@ namespace Budget.Controllers.DB;
 public class MoneyController : DbModelEditController<Money>
 {
     public MoneyController(AbsUserService userService, DbModelService<Money> dbService) : base(userService, dbService) { }
+
+    protected override IActionResult RedirectToBack()
+        => Redirect("/money/models");
 }
 
