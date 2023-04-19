@@ -1,0 +1,11 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+@section BelowHeader {
+    <h3 class="text-secondary">@ViewBag.Title</h3>
+    <hr />
+    @RenderSection("UnderBody", required: false)
+}
+
+@RenderBody()

@@ -4,7 +4,7 @@
     ViewBag.Title = title;
 }
 @section Link{
-    <a asp-action="Register" asp-controller="Account" class="btn btn-outline-primary">@AcсountModes.Register</a>
+    <a href="/@AcсountModes.Register.ToStringAndLower()" class="btn btn-outline-primary">@AcсountModes.Register</a>
 }
 
 <form method="post" class="form-group">
@@ -22,6 +22,7 @@
     <span asp-validation-for="IsRememberMe" class="text-danger"></span>
     <input asp-for="IsRememberMe" class="form-control my_input" />
     <br />
+    <input type="hidden" name="returnUrl" value=@ViewBag.ReturnUrl />
     <input type="submit" value=@title class="btn btn-outline-primary" />
 </form>
 

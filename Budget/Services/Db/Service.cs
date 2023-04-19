@@ -21,9 +21,11 @@ public abstract class Service<TModel, TId> where TModel : class
     protected abstract Func<TModel, bool> PredicateForModelById(TId modelId);
     protected abstract TModel CreateModelById(TId modelId);
 
+    public virtual TModel CreateAddModel()
+        => CreateModelById(default!);
 
     public virtual async Task<TModel?> GetModelByIdAsync(TId modelId)
-        => await models.FirstOrDefaultAsync(o => PredicateForModelById(modelId)(o));
+        => (await models.ToListAsync()).FirstOrDefault(o => PredicateForModelById(modelId)(o));
 
     public virtual async Task<TModel?> GetModelDetailsByIdAsync(TId modelId)
         => await GetModelByIdAsync(modelId);

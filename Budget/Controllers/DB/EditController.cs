@@ -13,16 +13,31 @@ using Budget.Models.Database;
 namespace Budget.Controllers.DB;
 
 [Authorize]
-public abstract class EditController<TModel, TId> : BudgetController where TModel : class
+public abstract class EditController<TModel, TId> : BudgetController where TModel : class, new()
 {
     protected readonly Service<TModel, TId> service;
-    public EditController(AbsUserService userService, Service<TModel, TId> service) : base(userService)
+    public EditController(UserService userService, Service<TModel, TId> service) : base(userService)
         => this.service = service;
 
-    abstract protected TModel CreateAddModel();
+    protected const string partPathToId = "{id}";
+    protected const string partPathAdd = "add";
+    protected const string partPathEdit = "edit";
+    protected const string partPathDelete = "delete";
 
-    [HttpGet("models/{id}")]
-    public virtual async Task<IActionResult> GetModelByIdAsync(TId id)
+    #region Actions
+
+    protected const string pathToModels = "models";
+
+    protected virtual async Task<IActionResult> GetModelsAsync()
+            => View("Models", await service.GetModelsAsync());
+
+
+    protected const string pathToModelById = $"{pathToModels}/{partPathToId}";
+
+    protected virtual TModel CreateAddModel()
+        => service.CreateAddModel();
+
+    protected virtual async Task<IActionResult> GetModelByIdAsync(TId id)
     {
         TModel? model = await service.GetModelByIdAsync(id);
 
@@ -32,17 +47,14 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
         return ViewModel(model!, Mode.Get);
     }
 
-    [HttpGet("models")]
-    public virtual async Task<IActionResult> GetModelsAsync()
-            => View("Models", await service.GetModelsAsync());
 
+    protected const string pathToAddModel = $"{pathToModels}/{partPathAdd}";
 
-    [HttpGet("add")]
-    public virtual Task<IActionResult> AddAsync()
+    protected virtual Task<IActionResult> AddAsync()
         => GetActionResultAsync(ViewModel(CreateAddModel(), Mode.Add));
 
-    [HttpPost("add")]
-    public virtual Task<IActionResult> AddAsync(TModel model)
+
+    protected virtual Task<IActionResult> AddAsync(TModel model)
         => DoActionIfValid(AddAsyncIfValid, new ModelWithMode<TModel>(model, Mode.Add));
 
     protected virtual async Task<IActionResult> AddAsyncIfValid(TModel model)
@@ -52,15 +64,18 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
     }
 
 
-    [HttpGet("edit/{id}")]
-    public virtual async Task<IActionResult> EditAsync(TId id)
+    protected const string pathToEditModelGet = $"{pathToModelById}/{partPathEdit}";
+
+    protected virtual async Task<IActionResult> EditAsync(TId id)
     {
         TModel? model = await service.GetModelByIdAsync(id);
         return RedirectToBackIfModelIsNull(ViewModel(model!, Mode.Edit), model);
     }
 
-    [HttpPost("edit")]
-    public virtual Task<IActionResult> EditAsync(TModel model)
+
+    protected const string pathToEditModelPost = $"{pathToModels}/{partPathEdit}";
+
+    protected virtual Task<IActionResult> EditAsync(TModel model)
         => DoActionIfValid(EditAsyncIfValid, new ModelWithMode<TModel>(model, Mode.Edit));
 
     protected virtual Task<IActionResult> EditAsyncIfValid(TModel model)
@@ -70,14 +85,17 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
     }
 
 
-    [HttpGet("delete/{id}")]
-    public virtual Task<IActionResult> DeleteAsync(TId id)
+    protected const string pathToDeleteModel = $"{pathToModelById}/{partPathDelete}";
+
+    protected virtual Task<IActionResult> DeleteAsync(TId id)
     {
         service.DeleteModelById(id);
         return GetActionResultAsync(RedirectToBack());
     }
-    
 
+    #endregion
+
+    #region Action Helpers
 
     protected IActionResult RedirectToBackIfModelIsNull(IActionResult action, TModel? model)
         => model is not null ? action : RedirectToBack();
@@ -88,4 +106,6 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
         => Task.FromResult(actionResult);
     protected IActionResult ViewModel(TModel model, Mode mode)
         => View("Model", new ModelWithMode<TModel>(model, mode));
+
+    #endregion
 }

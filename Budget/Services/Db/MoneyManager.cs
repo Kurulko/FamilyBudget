@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Budget.Services.Db;
 
-public class MoneyService : DbModelService<Money>
+public class MoneyManager : DbModelService<Money>
 {
-    public MoneyService(BudgetContext db) : base(db) { }
+    public MoneyManager(BudgetContext db) : base(db) { }
 
     protected override DbSet<Money> models => db.Money;
 }

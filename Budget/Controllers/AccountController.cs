@@ -13,17 +13,17 @@ public class AccountController : MainController
     public AccountController(IAccountService accountService)
         => this.accountService = accountService;
 
-    [HttpGet]
+    [HttpGet("register")]
     public IActionResult Register() => View();
 
-    [HttpPost]
+    [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterModel model)
     {
-        if(ModelState.IsValid)
+        if (ModelState.IsValid)
         {
             IdentityResult result = await accountService.RegisterAsync(model);
 
-            if(result.Succeeded)
+            if (result.Succeeded)
                 return RedirectToHome();
             else
                 foreach (IdentityError error in result.Errors)
@@ -33,25 +33,29 @@ public class AccountController : MainController
     }
 
 
-    [HttpGet]
-    public IActionResult Login() => View();
-
-    [HttpPost]
-    public async Task<IActionResult> Login(LoginModel model)
+    [HttpGet("login")]
+    public IActionResult Login([FromQuery] string? returnUrl)
     {
-        if(ModelState.IsValid)
+        ViewBag.ReturnUrl = returnUrl;
+        return View();
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginModel model, string? returnUrl)
+    {
+        if (ModelState.IsValid)
         {
             bool result = await accountService.LoginAsync(model);
-
             if (result)
-                return RedirectToHome();
-            else
-                ModelState.AddModelError(string.Empty, "Wrong password or/and email");
+                return returnUrl is null ? RedirectToHome() : Redirect(returnUrl);
+
+            ModelState.AddModelError(string.Empty, "Wrong password or/and email");
+            ViewBag.ReturnUrl = returnUrl;
         }
         return View(model);
     }
 
-    [HttpGet]
+    [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
         await accountService.LogoutAsync();

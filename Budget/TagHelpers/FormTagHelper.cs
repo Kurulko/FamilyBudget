@@ -16,7 +16,7 @@ public class FormValidationTagHelper : TagHelper
 
         form.AddCssClass("form-group");
         form.Attributes.Add("method", "post");
-        form.Attributes.Add("href", FormModel.Href);
+        form.Attributes.Add("action", FormModel.Action);
 
         TagBuilder divVal = new("div");
 

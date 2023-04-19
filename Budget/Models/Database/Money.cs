@@ -4,7 +4,8 @@ namespace Budget.Models.Database;
 
 public class Money : DbModel
 {
-    public decimal Count { get; set; }
+    public decimal Price { get; set; }
+
     [Display(Name = "Type")]
     public TypeOfMoney TypeOfMoney { get; set; }
 

@@ -11,92 +11,130 @@ using Microsoft.AspNetCore.Routing;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using Budget.Services.Db.Operations;
+using Budget.Services.Db.Categories;
+using Budget.Extensions;
 
 namespace Budget.Controllers.DB;
 
-[Route("operations")]
+[Route(name)]
 public class OperationController : DbModelEditController<Operation>
 {
-    readonly DbModelService<Category> categoryService;
-    readonly DbModelService<Currency> currencyService;
-    public OperationController(AbsUserService userService, DbModelService<Operation> dbService, DbModelService<Category> categoryService, DbModelService<Currency> currencyService)
-        : base(userService, dbService)
+    readonly CategoryService categoryService;
+    readonly Service<Currency, long> currencyService;
+    public OperationController(UserService userService, OperationService operationService, CategoryService categoryService, Service<Currency, long> currencyService)
+        : base(userService, operationService)
         => (this.categoryService, this.currencyService) = (categoryService, currencyService);
 
     protected override IActionResult RedirectToBack()
-        => Redirect("/operations/models");
+        => Redirect($"/{name}/{typeOfOperation.ToStringAndLower()}/{pathToModels}");
 
-    const string urlOfModels = "{type}/models";
+    const string name = "operations";
+    const string urlOfModels = "{type}/" + pathToModels;
 
-    async Task SetData()
+    protected override Operation CreateAddModel()
     {
-        ViewBag.Categories = new SelectList(await categoryService.GetAllModelsAsync(), "Id", "Name");
-        ViewBag.Currencies = new SelectList(await currencyService.GetAllModelsAsync(), "Id", "ShortName");
+        Operation o = base.CreateAddModel();
+        o.Money = new();
+        o.TypeOfOperation = typeOfOperation;
+        return o;
     }
 
-    [HttpGet(urlOfModels + "/{id:long}")]
-    public override async Task<IActionResult> GetModelByIdAsync(long id)
+    TypeOfOperation typeOfOperation = new();
+
+    async Task SetData(string? userId = null, long? id = null)
     {
-        await SetData();
-        return await base.GetModelByIdAsync(id);
+        categoryService.UserId = GetUserId(userId);
+        ViewBag.Categories = new SelectList(await categoryService.GetParentCategoriesAsync(), nameof(Category.Id), nameof(Category.Name));
+
+        IEnumerable<Category>? subCategories = null;
+        if(id != 0 && id is not null)
+        {
+            SetUserId(userId);
+            Operation? operation = await service.GetModelByIdAsync(id!.Value);
+            if(operation is not null)
+                subCategories = await categoryService.GetChildCategoriesByParentIdAsync(operation!.CategoryId!.Value);
+        }
+        ViewBag.SubCategories = (subCategories?.Any() ?? false) ? new SelectList(subCategories, nameof(Category.Id), nameof(Category.Name)) : null;
+
+        ViewBag.Currencies = new SelectList(await currencyService.GetModelsAsync(), nameof(Currency.Id), nameof(Currency.Symbol));
     }
 
-    [HttpGet(urlOfModels + "/add")]
-    public override async Task<IActionResult> AddAsync()
+    
+
+    [HttpGet($"{urlOfModels}/{partPathToId}")]
+    [HttpGet($"{partPathToUserId}/{urlOfModels}/{partPathToId}")]
+    public async Task<IActionResult> GetModelByIdAsync(string? userId, long id, TypeOfOperation type)
     {
-        await SetData();
-        return await base.AddAsync();
+        SetTypeOfOperation(type);
+        await SetData(userId, id);
+        return await base.GetModelByIdAsync(userId, id);
     }
 
-    [HttpGet(urlOfModels + "/{id}/edit")]
-    public override async Task<IActionResult> EditAsync(long id)
+
+    [HttpGet($"{urlOfModels}/{partPathAdd}")]
+    [HttpGet($"{partPathToUserId}/{urlOfModels}/{partPathAdd}")]
+    public async Task<IActionResult> AddAsync(string? userId, TypeOfOperation type)
     {
-        await SetData();
-        return await base.EditAsync(id);
+        SetTypeOfOperation(type);
+        await SetData(userId);
+        return await base.AddAsync(userId);
     }
+
+
+    [HttpPost($"{urlOfModels}/{partPathAdd}")]
+    [HttpPost($"{partPathToUserId}/{urlOfModels}/{partPathAdd}")]
+    public async Task<IActionResult> AddAsync(string? userId, Operation model, TypeOfOperation type)
+    {
+        SetTypeOfOperation(type);
+        await SetData(userId);
+        return await base.AddAsync(userId, model);
+    }
+
+
+    [HttpGet($"{urlOfModels}/{partPathToId}/{partPathEdit}")]
+    [HttpGet($"{partPathToUserId}/{urlOfModels}/{partPathToId}/{partPathEdit}")]
+    public async Task<IActionResult> EditAsync(string? userId, long id, TypeOfOperation type)
+    {
+        SetTypeOfOperation(type);
+        await SetData(userId, id);
+        return await base.EditAsync(userId, id);
+    }
+
+
+    [HttpPost($"{urlOfModels}/{partPathEdit}")]
+    [HttpPost($"{partPathToUserId}/{urlOfModels}/{partPathEdit}")]
+    public async Task<IActionResult> EditAsync(string? userId, Operation model, TypeOfOperation type)
+    {
+        SetTypeOfOperation(type);
+        await SetData(userId);
+        return await base.EditAsync(userId, model);
+    }
+
 
     [HttpGet(urlOfModels)]
-    public override async Task<IActionResult> GetModelsAsync()
+    [HttpGet($"{partPathToUserId}/{urlOfModels}")]
+    public async Task<IActionResult> GetModelsAsync(string? userId, TypeOfOperation type)
     {
-        TypeOfOperation typeOfOperation = GetTypeOfOperationFromQuery();
+        SetUserId(userId);
 
-        SetUserId();
+        OperationService operationService = (service as OperationService)!;
+        var groupsMoney = operationService.GetCurrentSumsOfMoney();
+        var groupsOperation = await operationService.GetGroupsOperationByPredicateAsync(o => o.TypeOfOperation == type);
 
-        var groupsMoney = (service as OperationService)!.GetCurrentSumsOfMoney();
-        var operations = await service.GetModelsByPredicateAsync(o => o.TypeOfOperation == typeOfOperation);
-
-        var groupsOperation = operations.GroupBy(o => new MonthAndYear(o.DateTime.Month, o.DateTime.Year),
-            (MonthAndYear may, IEnumerable<Operation> ops) => new GroupOperation() { Month = may.Month, Year = may.Year, Operations = ops });
-
-        return View("Models", new ModelWithTypeOfOperation<GroupsOperationAndGroupsMoney>(new GroupsOperationAndGroupsMoney() { GroupsMoney = groupsMoney, GroupsOperation = groupsOperation }, typeOfOperation));
+        return View("Models", new ModelWithTypeOfOperation<GroupsOperationAndGroupsMoney>(new GroupsOperationAndGroupsMoney() { GroupsMoney = groupsMoney, GroupsOperation = groupsOperation }, type));
     }
-    public record MonthAndYear(int Month, int Year);
 
 
-    [HttpGet(urlOfModels + "/{id}/delete")]
-    public override Task<IActionResult> DeleteAsync(long id)
-        => base.DeleteAsync(id);
-
-    [HttpPost(urlOfModels + "/add")]
-    public override Task<IActionResult> AddAsync(Operation model)
-        => base.AddAsync(model);
-
-    [HttpPost(urlOfModels + "/edit")]
-    public override Task<IActionResult> EditAsync(Operation model)
-        => base.EditAsync(model);
-
-
-    TypeOfOperation GetTypeOfOperationFromQuery()
+    [HttpGet($"{urlOfModels}/{partPathToId}/{partPathDelete}")]
+    [HttpGet($"{partPathToUserId}/{urlOfModels}/{partPathToId}/{partPathDelete}")]
+    public Task<IActionResult> DeleteAsync(string? userId, long id, TypeOfOperation type)
     {
-        string? typeStr = HttpContext.GetRouteValue("type")?.ToString();
-
-        TypeOfOperation typeOfOperation = typeStr?.ToLower() switch
-        {
-            "purchase" => TypeOfOperation.Purchase,
-            "receiving" => TypeOfOperation.Receiving,
-            _ => TypeOfOperation.Purchase
-        };
-
-        return typeOfOperation;
+        SetTypeOfOperation(type);
+        return base.DeleteAsync(userId, id);
     }
+
+
+    void SetTypeOfOperation(TypeOfOperation typeOfOperation)
+        => this.typeOfOperation = typeOfOperation;
 }

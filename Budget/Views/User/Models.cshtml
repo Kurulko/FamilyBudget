@@ -1,0 +1,55 @@
+﻿@model IEnumerable<User>
+@{
+    ViewBag.Title = "Users";
+}
+
+
+<a href="@($"add")"
+   class="btn btn-outline-info">
+    <em>Add</em>
+</a>
+
+@if (Model.Any())
+{
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Registered</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (User user in Model)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>@user.Email</td>
+                            <td>@user.RegisteredTime</td>
+                            <td>
+                                <a href="@($"models/{user.Id}")"
+                                   class="btn btn-outline-primary">
+                                    <em>Details</em>
+                                </a>
+                                <a href="@($"models/{user.Id}/edit")"
+                                   class="btn btn-outline-warning">
+                                    <em>Edit</em>
+                                </a>
+                                <a href="@($"models/{user.Id}/delete")"
+                                   class="btn btn-outline-danger">
+                                    <em>Delete</em>
+                                </a>
+                            </td>
+                        </tr>
+                   }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

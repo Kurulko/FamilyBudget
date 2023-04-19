@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "_BudgetLayout";
+}
+
+@{
+    Mode mode = ViewBag.Mode;
+
+    bool isEdit = mode == Mode.Edit || mode == Mode.Add;
+    string color = ModeHelper.GetBootstrapColorByMode(mode);
+
+    string pathToForm = ViewBag.PathToForm;
+    string pathToEdit = ViewBag.PathToEdit;
+
+    FormModel formModel = new() { Action = $"/{pathToForm}/{mode.ToStringAndLower()}", Mode = mode };
+}
+
+@section UnderBody {
+    <h3 class="text-@color">@mode</h3>
+    <br />
+    @if (mode != Mode.Add)
+    {
+        @if (mode != Mode.Edit)
+        {
+            <a href="@($"{pathToEdit}/edit")"
+               class="btn btn-outline-warning">
+                <em>Edit</em>
+            </a>
+        }
+        <a href="@($"{pathToEdit}/delete")"
+           class="btn btn-outline-danger">
+            <em>Delete</em>
+        </a>
+    }
+}
+
+<form-validation form-model="@formModel">
+    @RenderBody()
+</form-validation>
+
+<br />
+@RenderSection("BelowForm", required: false)

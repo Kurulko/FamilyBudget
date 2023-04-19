@@ -3,8 +3,8 @@
     string title = AcсountModes.Register;
     ViewBag.Title = title;
 }
-@section Link{
-    <a asp-action="Login" asp-controller="Account" class="btn btn-outline-primary">@AcсountModes.Login</a>
+@section Link {
+    <a href="/@AcсountModes.Login.ToStringAndLower()" class="btn btn-outline-primary">@AcсountModes.Login</a>
 }
 
 <form method="post" class="form-group">

@@ -1,4 +1,5 @@
 ﻿using Budget.Controllers;
+using Budget.Services.Db;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -35,6 +36,14 @@ public class BudgetContext : IdentityDbContext<User>
             .WithOne(sc => sc.ParentCategory)
             .HasForeignKey(c => c.ParentCategoryId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        List<Currency> currencies = new(){
+            new() { Id = 1, ShortName = "UAN", FullName = "grivna", Symbol = '₴'},
+            new() { Id = 2, ShortName = "DOL", FullName = "dollar", Symbol = '$'},
+            new() { Id = 3, ShortName = "EURO", FullName = "euro", Symbol = '€'}
+        };
+        builder.Entity<Currency>().HasData(currencies);
+
 
         base.OnModelCreating(builder);
     }

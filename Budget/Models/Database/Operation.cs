@@ -9,6 +9,9 @@ public class Operation : DbModel
     public string? Description { get; set; }
     public DateTime DateTime { get; set; } = DateTime.Now;
 
+    [Display(Name = "Monthly?")]
+    public bool IsMonthly { get; set; }
+
     [Display(Name = "Type")]
     public TypeOfOperation TypeOfOperation { get; set; }
 
@@ -16,6 +19,8 @@ public class Operation : DbModel
     public Money? Money { get; set; }
     public long? CategoryId { get; set; }
     public Category? Category { get; set; }
+    public long? SubCategoryId { get; set; }
+    public Category? SubCategory { get; set; }
 }
 
 public enum TypeOfOperation

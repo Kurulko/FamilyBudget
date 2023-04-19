@@ -50,14 +50,10 @@
             color: white;
         }
 
-        .menu ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .menu li a {
-            margin-top: 30%;
-        }
+            .menu ul {
+                list-style: none;
+                padding: 0;
+            }
 
         .menu-toggle {
             font-size: 24px;
@@ -69,12 +65,16 @@
             cursor: pointer;
         }
 
+        #me {
+            margin-right: 10%;
+        }
     </style>
 </head>
 <body>
     <header>
         <button class="menu-toggle">&#9776;</button>
         <h4>Personal Budget</h4>
+        <a class="btn btn-primary" href="/me" id="me">Me</a>
     </header>
 
     <div class="row">
@@ -83,26 +83,40 @@
                 <div class="row">
                     <div class="col-md-3"></div>
                     <div class="col-md-6">
-                        <ul>
-                            <li>
-                                <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models")"
-                                   class="btn btn-outline-primary">
-                                    <em>Purchases</em>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="@($"/operations/{TypeOfOperation.Receiving.ToString().ToLower()}/models")"
-                                   class="btn btn-outline-primary">
-                                    <em>Receiving</em>
-                                </a>
-                            </li>
-                            <li>
-                                <a asp-controller="operations" asp-action="models"
-                                   class="btn btn-outline-primary">
-                                    <em>Compare</em>
-                                </a>
-                            </li>
-                        </ul>
+                        <br />
+                        <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models")"
+                           class="btn btn-outline-primary">
+                            <em>Purchases</em>
+                        </a>
+                        <br /> <br />
+                        <a href="@($"/operations/{TypeOfOperation.Receiving.ToString().ToLower()}/models")"
+                           class="btn btn-outline-primary">
+                            <em>Receiving</em>
+                        </a>
+                        <br /> <br />
+                        <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models")"
+                           class="btn btn-outline-primary">
+                            <em>Compare</em>
+                        </a>
+                        <br /> <br />
+                        <a href="@($"/categories/models")"
+                           class="btn btn-outline-primary">
+                            <em>Categories</em>
+                        </a>
+                        <br /> <br />
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <a href="@($"/users/models")"
+                               class="btn btn-outline-primary">
+                                <em>Users</em>
+                            </a>
+                            <br /> <br />
+                            <a href="@($"/roles/models")"
+                               class="btn btn-outline-primary">
+                                <em>Roles</em>
+                            </a>
+                            <br /> <br />
+                        }
                     </div>
                 </div>
             </div>
@@ -123,12 +137,13 @@
         </div>
     </div>
 
+    <br />
     <footer class="border-top footer text-muted">
         <div class="container" style="font-style: oblique;">
             &copy; 2023 - Personal Budget
             @if (User.Identity!.IsAuthenticated)
             {
-                <a asp-action="Logout" asp-controller="Account">@AcсountModes.Logout</a>
+                <a href="/@AcсountModes.Logout.ToStringAndLower()">@AcсountModes.Logout</a>
             }
             @RenderSection("Link", required: false)
         </div>

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace Budget.Services.Db.Users;
+namespace Budget.Services.Db;
 
-public class RoleService : Service<IdentityRole, string>
+public class UserRoleManager : Service<IdentityRole, string>
 {
-    public RoleService(BudgetContext db) : base(db) { }
+    public UserRoleManager(BudgetContext db) : base(db) { }
 
     protected override DbSet<IdentityRole> models => db.Roles;
 
@@ -15,8 +15,8 @@ public class RoleService : Service<IdentityRole, string>
         => new() { Id = modelId };
 
     protected override Func<IdentityRole, bool> PredicateForModelById(string modelId)
-        => (IdentityRole r) => r.Id == modelId;
+        => (r) => r.Id == modelId;
 
     protected override Func<IdentityRole, bool> PredicateForModels()
-        => (IdentityRole r) => true;
+        => (r) => true;
 }

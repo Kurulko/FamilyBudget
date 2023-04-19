@@ -1,13 +1,9 @@
 ﻿@model ModelWithTypeOfOperation<GroupsOperationAndGroupsMoney>
 @{
-    ViewBag.Title = "Operations";
+    ViewBag.Title = @Model.TypeOfOperation;
 
     var groupsOperation = Model.Model.GroupsOperation;
     var groupsMoney = Model.Model.GroupsMoney;
-}
-@section BelowHeader {
-    <h3 class="text-secondary">@Model.TypeOfOperation</h3>
-    <hr />
 }
 
 <partial name="_OperationLayout" for="@groupsMoney" />
@@ -25,11 +21,11 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Description</th>
-                <th>Time</th>
+                <th>Date</th>
                 <th>Money</th>
                 <th>Type</th>
                 <th>Category</th>
+                <th>Sub Category</th>
                 <th></th>
             </tr>
         </thead>
@@ -38,7 +34,7 @@
             {
                 <tr>
                     <td colspan="7" class="text-center text-info bg-dark">
-                        @(DateTime.MinValue.AddYears(groupOperation.Year - 1).AddMonths(groupOperation.Month).ToString("MMMM yyyy"))
+                        @(DateTime.MinValue.AddYears(groupOperation.Year - 1).AddMonths(groupOperation.Month - 1).ToString("MMMM yyyy"))
                     </td>
                 </tr>
 
@@ -46,11 +42,11 @@
                 {
                     <tr>
                         <td>@operation.Name</td>
-                        <td>@operation.Description</td>
-                        <td>@operation.DateTime</td>
-                        <td>@Currency.Display(operation.Money?.Currency?.Symbol ?? ' ', operation.Money?.Count ?? 0)</td>
+                        <td>@operation.DateTime.ToString("MM.dd.yyyy")</td>
+                        <td>@Currency.Display(operation.Money?.Currency?.Symbol ?? ' ', operation.Money?.Price ?? 0)</td>
                         <td>@(operation.Money!.TypeOfMoney)</td>
-                        <td>@(operation.Category?.Name ?? "")</td>
+                        <td>@operation.Category?.Name</td>
+                        <td>@operation.SubCategory?.Name</td>
                         <td>
                             <a href="@($"models/{operation.Id}")"
                                class="btn btn-outline-primary">

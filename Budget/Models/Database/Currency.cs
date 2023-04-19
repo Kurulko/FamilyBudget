@@ -2,8 +2,9 @@
 
 namespace Budget.Models.Database;
 
-public class Currency : DbModel
+public class Currency
 {
+    public long Id { get; set; }
     public string FullName { get; set; } = null!;
     public string? ShortName { get; set; }
     public char Symbol { get; set; }

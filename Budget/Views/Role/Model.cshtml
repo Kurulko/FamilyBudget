@@ -1,0 +1,37 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@model ModelWithMode<IdentityRole>
+
+@{
+    Layout = "_BudgetEditLayout";
+
+    Mode mode = Model.Mode;
+    IdentityRole? role = Model.Model;
+
+    bool isEdit = mode == Mode.Edit || mode == Mode.Add;
+
+    ViewBag.Title = "Role";
+    ViewBag.Mode = mode;
+
+    string pathToForm = "/roles/models";
+    ViewBag.PathToForm = pathToForm;
+    ViewBag.PathToEdit = $"{pathToForm}/{role.Id}";
+}
+
+
+
+<div class="row">
+    <div class="col">
+        <label asp-for="Model.Name"></label>
+    </div>
+    <div class="col">
+        <input asp-for="Model.Name" disabled="@(!isEdit)" />
+        @if (isEdit)
+        {
+            <p><span asp-validation-for="Model.Name" class="text-danger"></span></p>
+        }
+    </div>
+    <div class="col"></div>
+</div>
+
+
+

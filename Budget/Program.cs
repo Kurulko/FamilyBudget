@@ -2,6 +2,8 @@ using Budget.Initializer;
 using Budget.Models.Database;
 using Budget.Services.Account;
 using Budget.Services.Db;
+using Budget.Services.Db.Categories;
+using Budget.Services.Db.Operations;
 using Budget.Services.Db.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -23,14 +25,15 @@ string connection = config.GetConnectionString("DefaultConnection");
 services.AddDbContext<BudgetContext>(opts => opts.UseSqlServer(connection));
 
 services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<BudgetContext>();
-services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new PathString("/Account/Register"));
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new PathString("/register"));
 
 services.AddScoped<IAccountService, AccountService>();
-services.AddScoped<AbsUserService, UserService>();
-services.AddScoped<DbModelService<Operation>, OperationService>();
-services.AddScoped<DbModelService<Money>, MoneyService>();
-services.AddScoped<DbModelService<Category>, CategoryService>();
-services.AddScoped<DbModelService<Currency>, CurrencyService>();
+services.AddScoped<UserService, UserManager>();
+services.AddScoped<OperationService, OperationManager>();
+services.AddScoped<CategoryService, CategoryManager>();
+services.AddScoped<Service<IdentityRole, string>, UserRoleManager>();
+services.AddScoped<Service<Currency, long>, CurrencyManager>();
+services.AddScoped<DbModelService<Money>, MoneyManager>();
 
 services.AddControllersWithViews().AddNewtonsoftJson();
 services.AddSwaggerGen();
@@ -66,11 +69,10 @@ using (IServiceScope serviceScope = app.Services.CreateScope())
 
     if(userId is not null)
     {
-        var operationService = serviceProvider.GetRequiredService<DbModelService<Operation>>();
-        var categoryService = serviceProvider.GetRequiredService<DbModelService<Category>>();
+        var operationService = serviceProvider.GetRequiredService<OperationService>();
+        var categoryService = serviceProvider.GetRequiredService<CategoryService>();
         var moneyService = serviceProvider.GetRequiredService<DbModelService<Money>>();
-        var currencyService = serviceProvider.GetRequiredService<DbModelService<Currency>>();
-        await DataInitializer.InitializeAsync(userId, operationService, categoryService, moneyService, currencyService);
+        await DataInitializer.InitializeAsync(userId, operationService, categoryService, moneyService);
     }
 }
 
