@@ -234,7 +234,7 @@
             // element with data-val=true
             var $selector = $(selector),
                 $forms = $selector.parents()
-                    .addBack()
+                    .addback()
                     .filter("form")
                     .add($selector.find("form"))
                     .has("[data-val=true]");
@@ -272,7 +272,7 @@
         return this;
     };
 
-    adapters.addBool = function (adapterName, ruleName) {
+    adapters.addbool = function (adapterName, ruleName) {
         /// <summary>Adds a new adapter to convert unobtrusive HTML into a jQuery Validate validation, where
         /// the jQuery Validate validation rule has no parameter values.</summary>
         /// <param name="adapterName" type="String">The name of the adapter to be added. This matches the name used
@@ -367,7 +367,7 @@
     }
 
     adapters.addSingleVal("regex", "pattern");
-    adapters.addBool("creditcard").addBool("date").addBool("digits").addBool("email").addBool("number").addBool("url");
+    adapters.addbool("creditcard").addbool("date").addbool("digits").addbool("email").addbool("number").addbool("url");
     adapters.addMinMax("length", "minlength", "maxlength", "rangelength").addMinMax("range", "min", "max", "range");
     adapters.addMinMax("minlength", "minlength").addMinMax("maxlength", "minlength", "maxlength");
     adapters.add("equalto", ["other"], function (options) {

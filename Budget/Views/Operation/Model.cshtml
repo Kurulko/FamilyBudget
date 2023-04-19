@@ -1,0 +1,140 @@
+﻿@model ModelWithMode<Operation>
+
+@{
+    Layout = "_BudgetEditLayout";
+
+    Mode mode = Model.Mode;
+    Operation operation = Model.Model;
+
+    bool isEdit = mode == Mode.Edit || mode == Mode.Add;
+
+    ViewBag.Title = nameof(Operation);
+    ViewBag.Mode = mode;
+
+    string pathToForm = $"/operations/{operation.TypeOfOperation.ToStringAndLower()}/models";
+    ViewBag.PathToForm = pathToForm;
+    ViewBag.PathToEdit = $"{pathToForm}/{operation.Id}";
+
+}
+
+<section name="@nameof(Operation)">
+
+    <div class="row">
+        <div class="col">
+            <label asp-for="Model.Name"></label>
+        </div>
+        <div class="col">
+            <input asp-for="Model.Name" disabled="@(!isEdit)" />
+            @if (isEdit)
+            {
+                <p><span asp-validation-for="Model.Name" class="text-danger"></span></p>
+            }
+            else
+            {
+                <br />
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label asp-for="Model.Description"></label>
+        </div>
+        <div class="col">
+            <textarea asp-for="Model.Description" disabled="@(!isEdit)"></textarea>
+            @if (isEdit)
+            {
+                <p><span asp-validation-for="Model.Description" class="text-danger"></span></p>
+            }
+            else
+            {
+                <br />
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label asp-for="Model.DateTime"></label>
+        </div>
+        <div class="col">
+            <input asp-for="Model.DateTime" disabled="@(!isEdit)" />
+            @if (isEdit)
+            {
+                <p><span asp-validation-for="Model.DateTime" class="text-danger"></span></p>
+            }
+            else
+            {
+                <br />
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label asp-for="Model.IsMonthly"></label>
+        </div>
+        <div class="col">
+            <input asp-for="Model.IsMonthly" disabled="@(!isEdit)" />
+        </div>
+    </div>
+
+    @if (mode != Mode.Get)
+    {
+        <input type="hidden" asp-for="Model.Id" />
+        <input type="hidden" asp-for="Model.UserId" />
+    }
+</section>
+
+<section name="@nameof(Category)">
+    <select asp-for="Model.CategoryId" asp-items="ViewBag.Categories" disabled="@(!isEdit)" style="width:50%;"></select>
+    @if (isEdit)
+    {
+        <p><span asp-validation-for="Model.CategoryId" class="text-danger"></span></p>
+    }
+
+    @if (ViewBag.SubCategories is not null)
+    {
+        <br />
+        <select asp-for="Model.SubCategoryId" asp-items="ViewBag.SubCategories" disabled="@(!isEdit)"></select>
+        @if (isEdit)
+        {
+            <p><span asp-validation-for="Model.SubCategoryId" class="text-danger"></span></p>
+        }
+    }
+</section>
+
+
+<section name="@nameof(Money)">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <input asp-for="Model.Money!.Price" class="form-control" disabled="@(!isEdit)" />
+            @if (isEdit)
+            {
+                <p><span asp-validation-for="Model.Money!.Price" class="text-danger"></span></p>
+            }
+        </div>
+        <div class="col">
+            <select asp-for="Model.Money!.CurrencyId" asp-items="ViewBag.Currencies" disabled="@(!isEdit)"></select>
+            @if (isEdit)
+            {
+                <p><span asp-validation-for="Model.Money!.CurrencyId" class="text-danger"></span></p>
+            }
+        </div>
+        <div class="col"></div>
+    </div>
+    <br />
+    <select asp-for="Model.Money!.TypeOfMoney" asp-items="Html.GetEnumSelectList<TypeOfMoney>()" style="width:50%;" disabled="@(!isEdit)"></select>
+    @if (isEdit)
+    {
+        <p><span asp-validation-for="Model.Money!.TypeOfMoney" class="text-danger"></span></p>
+    }
+
+    @if (mode != Mode.Get)
+    {
+        <input type="hidden" asp-for="Model.Money!.Id" />
+        <input type="hidden" asp-for="Model.Money!.CurrencyId" />
+        <input type="hidden" asp-for="Model.Money!.UserId" />
+    }
+</section>

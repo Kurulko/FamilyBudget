@@ -6,57 +6,144 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-        header {
-            min-height: 35px;
-            background-color: black;
-            color: white;
-            text-align: center;
-        }
-
         a:hover {
             text-decoration-line: none;
         }
 
-        .my_input{
-            width:50%;
-            text-align:center;
+        .my_input {
+            width: 50%;
+            text-align: center;
         }
 
         label {
             font-weight: bold;
         }
 
-        span,label,th,td,input,option,select{
+        span, label, th, td, input, option, select, h4, h3 {
             font-style: oblique;
         }
 
+        body {
+            margin: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4f2684;
+            color: white;
+            width: 100%;
+        }
+
+            header h4 {
+                margin: 0 auto;
+            }
+
+        .menu {
+            top: 0;
+            left: 0;
+            height: 93.5%;
+            background-color: #3a0647;
+            color: white;
+        }
+
+            .menu ul {
+                list-style: none;
+                padding: 0;
+            }
+
+        .menu-toggle {
+            font-size: 24px;
+            background-color: transparent;
+            border: none;
+            color: white;
+            margin-left: 5px;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        #me {
+            margin-right: 10%;
+        }
     </style>
 </head>
 <body>
     <header>
-        <strong><em>@ViewData["Title"]</em></strong>
-        @{
-            var back = ViewData["Back"];
-        }
-        @if (back != null)
-        {
-            <a href= @back.ToString() class="btn btn-outline-info" style="margin-left:30%;">Назад</a>
-        }
+        <button class="menu-toggle">&#9776;</button>
+        <h4>Personal Budget</h4>
+        <a class="btn btn-primary" href="/me" id="me">Me</a>
     </header>
 
-    <br />
-    <center>
-        @RenderBody()
-    </center>
-    <br />
+    <div class="row">
+        <div class="col-md-2" id="left" hidden>
+            <div class="menu">
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <br />
+                        <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models")"
+                           class="btn btn-outline-primary">
+                            <em>Purchases</em>
+                        </a>
+                        <br /> <br />
+                        <a href="@($"/operations/{TypeOfOperation.Receiving.ToString().ToLower()}/models")"
+                           class="btn btn-outline-primary">
+                            <em>Receiving</em>
+                        </a>
+                        <br /> <br />
+                        <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models")"
+                           class="btn btn-outline-primary">
+                            <em>Compare</em>
+                        </a>
+                        <br /> <br />
+                        <a href="@($"/categories/models")"
+                           class="btn btn-outline-primary">
+                            <em>Categories</em>
+                        </a>
+                        <br /> <br />
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <a href="@($"/users/models")"
+                               class="btn btn-outline-primary">
+                                <em>Users</em>
+                            </a>
+                            <br /> <br />
+                            <a href="@($"/roles/models")"
+                               class="btn btn-outline-primary">
+                                <em>Roles</em>
+                            </a>
+                            <br /> <br />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12" id="right">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-10">
+                    <br />
+                    @RenderSection("BelowHeader", required: false)
+                    <center>
+                        <br /><br />
+                        @RenderBody()
+                        <br /><br />
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <br />
     <footer class="border-top footer text-muted">
         <div class="container" style="font-style: oblique;">
-            &copy; 2022 - Семейный бютжет
-            @if (User.Identity.IsAuthenticated)
+            &copy; 2023 - Personal Budget
+            @if (User.Identity!.IsAuthenticated)
             {
-                <a asp-action="Logout" asp-controller="Account">Выйти</a>
+                <a href="/@AcсountModes.Logout.ToStringAndLower()">@AcсountModes.Logout</a>
             }
             @RenderSection("Link", required: false)
         </div>
@@ -66,5 +153,36 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        const menuToggle = document.querySelector(".menu-toggle");
+        var open = false;
+
+        menuToggle.addEventListener("click", () => {
+            const menu = document.querySelector(".menu");
+            const left = document.getElementById("left");
+            const right = document.getElementById("right");
+
+            open = !open;
+
+            if (open) {
+                right.classList.remove("col-md-12");
+                left.removeAttribute("hidden");
+                left.classList.add("col-md-2");
+                right.classList.add("col-md-10");
+
+                menu.classList.add("open");
+            }
+            else {
+                left.classList.remove("col-md-2");
+                right.classList.remove("col-md-10");
+                left.setAttribute("hidden", "hidden");
+                right.classList.add("col-md-12");
+
+                menu.classList.remove("open");
+            }
+        });
+
+    </script>
 </body>
 </html>

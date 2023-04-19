@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Category>
+@{
+    ViewBag.Title = "Categories";
+}
+@section BelowHeader {
+    <h3 class="text-secondary">Categories</h3>
+    <hr />
+}
+
+
+<a href="@($"models/add")"
+   class="btn btn-outline-info">
+    <em>Add</em>
+</a>
+
+@if (Model.Any())
+{
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th></th>
+                        <th>SubCategories</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Category category in Model)
+                    {
+                        <tr>
+                            @{
+                                int countOfRows = (category?.ChildCategories?.Count() ?? 0) + 1;
+                            }
+                            <td rowspan="@countOfRows">@category!.Name</td>
+                            <td>
+                                <a href="@($"models/{category.Id}")"
+                                   class="btn btn-outline-primary">
+                                    <em>Details</em>
+                                </a>
+                                <a href="@($"models/{category.Id}/edit")"
+                                   class="btn btn-outline-warning">
+                                    <em>Edit</em>
+                                </a>
+                                <a href="@($"models/{category.Id}/delete")"
+                                   class="btn btn-outline-danger">
+                                    <em>Delete</em>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="@($"models/add/{category.Id}")"
+                                   class="btn btn-outline-info">
+                                    <em>Add</em>
+                                </a>
+
+                            </td>
+                            <td></td>
+                        </tr>
+                        @foreach (Category childcategory in category?.ChildCategories ?? Enumerable.Empty<Category>())
+                        {
+                            <tr>
+                                <td></td>
+                                <td>@childcategory.Name</td>
+                                <td>
+                                    <a href="@($"models/{childcategory.Id}")"
+                                       class="btn btn-outline-primary">
+                                        <em>Details</em>
+                                    </a>
+                                    <a href="@($"models/{childcategory.Id}/edit")"
+                                       class="btn btn-outline-warning">
+                                        <em>Edit</em>
+                                    </a>
+                                    <a href="@($"models/{childcategory.Id}/delete")"
+                                       class="btn btn-outline-danger">
+                                        <em>Delete</em>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                   }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

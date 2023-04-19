@@ -1,0 +1,32 @@
+﻿@model ModelWithMode<Currency>
+
+@{
+    Mode mode = Model.Mode;
+    bool isEdit = mode == Mode.Edit || mode == Mode.Add;
+    string color = ModeHelper.GetBootstrapColorByMode(mode);
+}
+
+<model-details for="Model.ShortName">
+    @if (isEdit)
+    {
+        <input asp-for="Model.ShortName" class="form-control" />
+        <p><span asp-validation-for="Model.ShortName" class="text-danger"></span></p>
+    }
+</model-details>
+
+<model-details for="Model.FullName">
+    @if (isEdit)
+    {
+        <input asp-for="Model.FullName" class="form-control" />
+        <p><span asp-validation-for="Model.FullName" class="text-danger"></span></p>
+    }
+</model-details>
+
+@if (mode != Mode.Get)
+{
+    <input type="hidden" asp-for="Model.Id" />
+}
+
+
+
+

@@ -1,0 +1,26 @@
+﻿@model IEnumerable<GroupMoney>
+@{
+    int countOfCardMoney = Model.Count(m => m.TypeOfMoney == TypeOfMoney.Card);
+    int countOfCashMoney = Model.Count(m => m.TypeOfMoney == TypeOfMoney.Cash);
+}
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th colspan="@countOfCardMoney" class="text-center">@TypeOfMoney.Card</th>
+                <th colspan="@countOfCashMoney" class="text-center">@TypeOfMoney.Cash</th>
+            </tr>
+       </thead>
+        <tbody>
+            <tr>
+                @foreach (var groupMoney in Model.OrderBy(m => m.TypeOfMoney))
+                {
+                    <td>@Currency.Display(groupMoney.CurrencySymbol, groupMoney.SumOfMoney)</td>
+                }
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <br />
+}

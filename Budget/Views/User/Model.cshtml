@@ -1,0 +1,115 @@
+﻿@model ModelWithMode<User>
+
+@{
+    Layout = "_BudgetEditLayout";
+
+    Mode mode = Model.Mode;
+    User user = Model.Model;
+
+    bool isEdit = mode == Mode.Edit || mode == Mode.Add;
+
+    ViewBag.Title = nameof(User);
+    ViewBag.Mode = mode;
+
+    string pathToForm = "/users/models";
+    ViewBag.PathToForm = pathToForm;
+    ViewBag.PathToEdit = $"{pathToForm}/{user.Id}";
+}
+
+
+
+<div class="row">
+    <div class="col">
+        <label asp-for="Model.UserName"></label>
+    </div>
+    <div class="col">
+        <input asp-for="Model.UserName" disabled="@(!isEdit)" />
+        @if (isEdit)
+        {
+            <p><span asp-validation-for="Model.UserName" class="text-danger"></span></p>
+        }
+        else
+        {
+            <br />
+        }
+    </div>
+    <div class="col"></div>
+</div>
+<div class="row">
+    <div class="col">
+        <label asp-for="Model.Email"></label>
+    </div>
+    <div class="col">
+        <input asp-for="Model.Email" disabled="@(!isEdit)" />
+        @if (isEdit)
+        {
+            <p><span asp-validation-for="Model.Email" class="text-danger"></span></p>
+        }
+        else
+        {
+            <br />
+        }
+    </div>
+    <div class="col"></div>
+</div>
+<div class="row">
+    <div class="col">
+        <label asp-for="Model.RegisteredTime"></label>
+    </div>
+    <div class="col">
+        <input asp-for="Model.RegisteredTime" disabled="@(!isEdit)" />
+        @if (isEdit)
+        {
+            <p><span asp-validation-for="Model.RegisteredTime" class="text-danger"></span></p>
+        }
+        else
+        {
+            <br />
+        }
+    </div>
+    <div class="col"></div>
+</div>
+
+@if (User.IsInRole(Roles.Admin))
+{
+    @section BelowForm {
+
+        <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models?userId={user.Id}")"
+           class="btn btn-outline-primary">
+            <em>Purchases</em>
+        </a>
+        <br />
+        <br />
+        <a href="@($"/operations/{TypeOfOperation.Receiving.ToString().ToLower()}/models?userId={user.Id}")"
+           class="btn btn-outline-primary">
+            <em>Receiving</em>
+        </a>
+        <br />
+        <br />
+        <a href="@($"/operations/{TypeOfOperation.Purchase.ToString().ToLower()}/models?userId={user.Id}")"
+           class="btn btn-outline-primary">
+            <em>Compare</em>
+        </a>
+        <br />
+        <br />
+        <a href="@($"/categories/models?userId={user.Id}")"
+           class="btn btn-outline-primary">
+            <em>Categories</em>
+        </a>
+        <br />
+        <br />
+        <a href=""
+           class="btn btn-outline-warning">
+            <em>Edit Password</em>
+        </a>
+        <br />
+        <br />
+        <a href=""
+           class="btn btn-outline-warning">
+            <em>Edit Role</em>
+        </a>
+        <br />
+    }
+}
+
+

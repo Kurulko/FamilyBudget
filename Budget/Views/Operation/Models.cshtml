@@ -1,0 +1,69 @@
+﻿@model ModelWithTypeOfOperation<GroupsOperationAndGroupsMoney>
+@{
+    ViewBag.Title = @Model.TypeOfOperation;
+
+    var groupsOperation = Model.Model.GroupsOperation;
+    var groupsMoney = Model.Model.GroupsMoney;
+}
+
+<partial name="_OperationLayout" for="@groupsMoney" />
+
+<a href="@($"models/add")"
+   class="btn btn-outline-info">
+    <em>Add</em>
+</a>
+
+@if (groupsOperation.Any())
+{
+    <br />
+    <br />
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Money</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Sub Category</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (GroupOperation groupOperation in groupsOperation)
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-info bg-dark">
+                        @(DateTime.MinValue.AddYears(groupOperation.Year - 1).AddMonths(groupOperation.Month - 1).ToString("MMMM yyyy"))
+                    </td>
+                </tr>
+
+                @foreach (Operation operation in groupOperation.Operations)
+                {
+                    <tr>
+                        <td>@operation.Name</td>
+                        <td>@operation.DateTime.ToString("MM.dd.yyyy")</td>
+                        <td>@Currency.Display(operation.Money?.Currency?.Symbol ?? ' ', operation.Money?.Price ?? 0)</td>
+                        <td>@(operation.Money!.TypeOfMoney)</td>
+                        <td>@operation.Category?.Name</td>
+                        <td>@operation.SubCategory?.Name</td>
+                        <td>
+                            <a href="@($"models/{operation.Id}")"
+                               class="btn btn-outline-primary">
+                                <em>Details</em>
+                            </a>
+                            <a href="@($"models/{operation.Id}/edit")"
+                               class="btn btn-outline-warning">
+                                <em>Edit</em>
+                            </a>
+                            <a href="@($"models/{operation.Id}/delete")"
+                               class="btn btn-outline-danger">
+                                <em>Delete</em>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
