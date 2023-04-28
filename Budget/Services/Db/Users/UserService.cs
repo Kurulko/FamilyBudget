@@ -19,10 +19,12 @@ public abstract class UserService : Service<User, string>
         => this.userManager = userManager;
 
     public abstract string? GetUserIdByClaims(ClaimsPrincipal userClaims);
-    public abstract Task ChangeUserPasswordAsync(ChangePassword changePassword, string userId);
-    public abstract Task AddUserPasswordAsync(ChangePassword changePassword, string userId);
+    public abstract Task<IdentityResult> ChangeUserPasswordAsync(ChangePassword changePassword, string userId);
+    public abstract Task<IdentityResult> AddUserPasswordAsync(ChangePassword changePassword, string userId);
     public abstract Task<bool> HasUserPasswordAsync(string userId);
+    public abstract Task<bool> IsInRoleAsync(string userId, string roleName);
     public abstract Task<IEnumerable<string>> GetRolesAsync(string userId);
-    public abstract Task AddRoleToUserAsync(string role, string userId);
-    public abstract Task DeleteRoleFromUserAsync(string userId, string roleName);
+    public abstract Task<IdentityResult> AddRoleToUserAsync(string role, string userId);
+    public abstract Task<IdentityResult> DeleteRoleFromUserAsync(string userId, string roleName);
+    public abstract Task AddNewAndDeleteOldRolesFromUserAsync(string userId, IEnumerable<string> roles);
 }

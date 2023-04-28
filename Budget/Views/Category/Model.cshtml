@@ -3,19 +3,27 @@
 @{
     Layout = "_BudgetEditLayout";
 
-    ViewBag.Title = "Category";
+    ViewBag.Title = nameof(Category);
     Mode mode = Model.Mode;
     Category? category = Model.Model;
 
     bool isEdit = mode == Mode.Edit || mode == Mode.Add;
 
     ViewBag.Title = nameof(Category);
-    ViewBag.Mode = mode;
+    string? userId = ViewBag.UserId;
 
-    string pathToForm = "/categories/models";
-    ViewBag.PathToForm = pathToForm;
-    ViewBag.PathToEdit = $"{pathToForm}/{category.Id}";
+    TagAModel tagAModel = new()
+            {
+                HrefBeforeUserId = CategoryController.name,
+                HrefAfterUserId = $"{CategoryController.pathToModels}/{category.Id}",
+                UserId = userId,
+                Mode = mode
+            };
+    ViewBag.TagAModel = tagAModel;
 
+
+    var parentCategory = category.ParentCategory;
+    var childCategories = category.ChildCategories;
 }
 
 <div class="row">
@@ -28,60 +36,86 @@
         {
             <p><span asp-validation-for="Model.Name" class="text-danger"></span></p>
         }
+        else
+        {
+            <br />
+        }
     </div>
     <div class="col"></div>
 </div>
-<div class="row">
-    <div class="col">
-        <label asp-for="Model.ParentCategory!.Name">Parent Category</label>
-    </div>
-    <div class="col">
-        <input asp-for="Model.ParentCategory!.Name" disabled="@(!isEdit)" />
-    </div>
-    <div class="col">
-        <a href="@($"/categories/models/{category.ParentCategory?.Id}")"
-           class="btn btn-outline-primary">
-            <em>Details</em>
-        </a>
-        <a href="@($"/categories/models/{category.ParentCategory?.Id}/edit")"
-           class="btn btn-outline-warning">
-            <em>Edit</em>
-        </a>
-        <a href="@($"/categories/models/{category.ParentCategory?.Id}/delete")"
-           class="btn btn-outline-danger">
-            <em>Delete</em>
-        </a>
-    </div>
-</div>
-<div class="row">
-    <div class="col">Sub Categories</div>
-    <div class="col">
-    </div>
-    <div class="col"></div>
-</div>
-
-@foreach (Category childCategory in category?.ChildCategories ?? Enumerable.Empty<Category>())
+@if (parentCategory is not null || isEdit)
 {
     <div class="row">
-        <div class="col"></div>
         <div class="col">
-            <input asp-for="@childCategory.Name" disabled="@(!isEdit)" />
+            <label asp-for="Model.ParentCategory!.Name">Parent Category</label>
         </div>
         <div class="col">
-            <a href="@($"/categories/models/{childCategory.Id}")"
-               class="btn btn-outline-primary">
-                <em>Details</em>
-            </a>
-            <a href="@($"/categories/models/{childCategory.Id}/edit")"
-               class="btn btn-outline-warning">
-                <em>Edit</em>
-            </a>
-            <a href="@($"/categories/models/{childCategory.Id}/delete")"
-               class="btn btn-outline-danger">
+            @if (parentCategory is not null)
+            {
+                <input asp-for="Model.ParentCategory!.Name" disabled="disabled"/>
+                <br />
+            }
+            <select asp-for="Model.ParentCategoryId" asp-items="ViewBag.ParentCategories" disabled="@(!isEdit)">
+                <option value="@null">Without</option>
+            </select>
+        </div>
+        <div class="col">
+            @if (parentCategory is not null)
+            {
+                <a href="@($"/categories/models/{category.ParentCategory?.Id}")"
+                class="btn btn-outline-primary">
+                    <em>Details</em>
+                </a>
+                <a href="@($"/categories/models/{category.ParentCategory?.Id}/edit")"
+                class="btn btn-outline-warning">
+                    <em>Edit</em>
+                </a>
+                <a href="@($"/categories/models/{category.ParentCategory?.Id}/delete")"
+                class="btn btn-outline-danger">
                 <em>Delete</em>
             </a>
+            }
         </div>
     </div>
+}
+
+@if (childCategories?.Any() ?? false)
+{
+    <div class="row">
+        <div class="col">
+            <br />
+            <label asp-for="Model.ChildCategories">Sub Categories</label>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col"></div>
+    </div>
+
+
+    @foreach (Category childCategory in category?.ChildCategories ?? Enumerable.Empty<Category>())
+    {
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <input asp-for="@childCategory.Name" disabled="disabled" />
+            </div>
+            <div class="col">
+                <a href="@($"/categories/models/{childCategory.Id}")"
+                   class="btn btn-outline-primary">
+                    <em>Details</em>
+                </a>
+                <a href="@($"/categories/models/{childCategory.Id}/edit")"
+                   class="btn btn-outline-warning">
+                    <em>Edit</em>
+                </a>
+                <a href="@($"/categories/models/{childCategory.Id}/delete")"
+                   class="btn btn-outline-danger">
+                    <em>Delete</em>
+                </a>
+            </div>
+        </div>
+        <br />
+    }
 }
 
 @if (mode != Mode.Get)
@@ -90,5 +124,7 @@
     <input type="hidden" asp-for="Model.ParentCategoryId" />
     <input type="hidden" asp-for="Model.UserId" />
 }
+
+<br />
 
 

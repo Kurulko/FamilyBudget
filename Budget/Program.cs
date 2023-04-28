@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -22,10 +23,16 @@ ConfigurationManager config = builder.Configuration;
 IServiceCollection services = builder.Services;
 
 string connection = config.GetConnectionString("DefaultConnection");
-services.AddDbContext<BudgetContext>(opts => opts.UseSqlServer(connection));
+services.AddDbContext<BudgetContext>(opts => {
+    opts.UseSqlServer(connection);
+    opts.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<BudgetContext>();
-services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new PathString("/register"));
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => {
+    options.LoginPath = new PathString("/register");
+    //options.AccessDeniedPath = new PathString("/register");
+});
 
 services.AddScoped<IAccountService, AccountService>();
 services.AddScoped<UserService, UserManager>();

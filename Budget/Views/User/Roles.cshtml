@@ -1,0 +1,30 @@
+﻿@model RolesAndUserId
+
+@{
+    Layout = "_BudgetEditLayout";
+
+
+    ViewBag.Title = $"{nameof(User)}'s roles";
+    ViewBag.Mode = Mode.Edit;
+
+    string pathToForm = $"/users/{Model.UserId}/roles";
+    ViewBag.PathToForm = pathToForm;
+    ViewBag.PathToEdit = pathToForm;
+
+    var roles = Model.Roles;
+}
+
+
+<div class="row">
+    <div class="col">
+        <label>Roles:</label>
+    </div>
+    <div class="col">
+        <select asp-for="@roles" asp-items="ViewBag.Roles" multiple></select>
+        <p><span asp-validation-for="Roles" class="text-danger"></span></p>
+    </div>
+    <div class="col"></div>
+</div>
+
+
+

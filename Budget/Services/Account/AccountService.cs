@@ -32,7 +32,10 @@ public class AccountService : IAccountService
         IdentityResult result = await userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
+        {
             await signInManager.SignInAsync(user, model.IsRememberMe);
+            await userManager.AddToRoleAsync(user, Roles.User);
+        }
 
         return result;
     }

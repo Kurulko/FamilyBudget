@@ -3,6 +3,7 @@ using Budget.Services.Db.Users;
 using Budget.Services.Db;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Budget.Models.ViewModel.Account;
 
 namespace Budget.Controllers.DB;
 
@@ -10,16 +11,22 @@ public abstract class DbModelEditController<TModel> : EditController<TModel, lon
 {
     public DbModelEditController(UserService userService, DbModelService<TModel> dbService) : base(userService, dbService) { }
 
-    protected const string partPathToUserId = "{userId}";
+    internal protected const string partPathToUserId = "{userId}";
 
     protected string userId => userService.GetUserIdByClaims(User)!;
 
-    protected virtual void SetUserId(string? userId)
+    protected virtual void SetUserIdInDbService(string? userId)
         => (service as DbModelService<TModel>)!.UserId = GetUserId(userId);
+    protected virtual void SetUserIdInViewBag(string? userId)
+        => ViewBag.UserId = userId;
+    protected virtual void SetUserId(string? userId)
+    {
+        SetUserIdInDbService(userId);
+        SetUserIdInViewBag(userId);
+    }
 
     protected string GetUserId(string? userId)
-        => userId is null ? this.userId : userId;
-
+        => userId is null || User.IsInRole(Roles.Admin) ? this.userId : userId;
 
 
     protected virtual Task<IActionResult> GetModelByIdAsync(string? userId, long id)

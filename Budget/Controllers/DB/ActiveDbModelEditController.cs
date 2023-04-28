@@ -13,7 +13,7 @@ public class ActiveDbModelEditController<TModel> : DbModelEditController<TModel>
     [HttpGet(pathToModelById)]
     [HttpGet($"{partPathToUserId}/{pathToModelById}")]
     public virtual new Task<IActionResult> GetModelByIdAsync(string? userId, long id)
-    => base.GetModelByIdAsync(userId, id);
+        => base.GetModelByIdAsync(userId, id);
 
 
     [HttpGet(pathToAddModel)]

@@ -9,12 +9,16 @@
     bool isEdit = mode == Mode.Edit || mode == Mode.Add;
 
     ViewBag.Title = nameof(Operation);
-    ViewBag.Mode = mode;
+    string? userId = ViewBag.UserId;
 
-    string pathToForm = $"/operations/{operation.TypeOfOperation.ToStringAndLower()}/models";
-    ViewBag.PathToForm = pathToForm;
-    ViewBag.PathToEdit = $"{pathToForm}/{operation.Id}";
-
+    TagAModel tagAModel = new()
+            {
+                HrefBeforeUserId = OperationController.name,
+                HrefAfterUserId = $"{operation.TypeOfOperation.ToStringAndLower()}/{OperationController.pathToModels}/{operation.Id}",
+                UserId = userId,
+                Mode = mode
+            };
+    ViewBag.TagAModel = tagAModel;
 }
 
 <section name="@nameof(Operation)">
@@ -87,7 +91,7 @@
 </section>
 
 <section name="@nameof(Category)">
-    <select asp-for="Model.CategoryId" asp-items="ViewBag.Categories" disabled="@(!isEdit)" style="width:50%;"></select>
+    <select asp-for="Model.CategoryId" asp-items="ViewBag.Categories" disabled="@(!isEdit)" style="width: 50%;"></select>
     @if (isEdit)
     {
         <p><span asp-validation-for="Model.CategoryId" class="text-danger"></span></p>
@@ -96,10 +100,14 @@
     @if (ViewBag.SubCategories is not null)
     {
         <br />
-        <select asp-for="Model.SubCategoryId" asp-items="ViewBag.SubCategories" disabled="@(!isEdit)"></select>
+        <select asp-for="Model.SubCategoryId" asp-items="ViewBag.SubCategories" disabled="@(!isEdit)" style="width: 50%;"></select>
         @if (isEdit)
         {
             <p><span asp-validation-for="Model.SubCategoryId" class="text-danger"></span></p>
+        }
+        else
+        {
+            <br />
         }
     }
 </section>
@@ -109,10 +117,14 @@
     <div class="row">
         <div class="col"></div>
         <div class="col">
-            <input asp-for="Model.Money!.Price" class="form-control" disabled="@(!isEdit)" />
+            <input asp-for="Model.Money!.Price" disabled="@(!isEdit)" />
             @if (isEdit)
             {
                 <p><span asp-validation-for="Model.Money!.Price" class="text-danger"></span></p>
+            }
+            else
+            {
+                <br />
             }
         </div>
         <div class="col">
@@ -121,15 +133,24 @@
             {
                 <p><span asp-validation-for="Model.Money!.CurrencyId" class="text-danger"></span></p>
             }
+            else
+            {
+                <br />
+            }
         </div>
         <div class="col"></div>
     </div>
     <br />
-    <select asp-for="Model.Money!.TypeOfMoney" asp-items="Html.GetEnumSelectList<TypeOfMoney>()" style="width:50%;" disabled="@(!isEdit)"></select>
+    <select asp-for="Model.Money!.TypeOfMoney" asp-items="Html.GetEnumSelectList<TypeOfMoney>()" disabled="@(!isEdit)" style="width: 50%;"></select>
     @if (isEdit)
     {
         <p><span asp-validation-for="Model.Money!.TypeOfMoney" class="text-danger"></span></p>
     }
+    else
+    {
+        <br />
+    }
+
 
     @if (mode != Mode.Get)
     {

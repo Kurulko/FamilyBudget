@@ -20,4 +20,7 @@ public class CategoryManager : CategoryService
 
     public override async Task<IEnumerable<Category>> GetParentCategoriesAsync()
         => (await GetModelsAsync()).ToList().Where(c => c.ParentCategoryId is null);
+
+    public override async Task<IEnumerable<Category>> GetModelsAsync()
+        => await modelsNoTracking.Include(m => m.ChildCategories).ToListAsync();
 }

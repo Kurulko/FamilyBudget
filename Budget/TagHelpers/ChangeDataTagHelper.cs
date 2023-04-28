@@ -11,7 +11,5 @@ namespace Budget.TagHelpers;
 public class ChangeDataTagHelper : TagHelper
 {
     public override void Process(TagHelperContext context, TagHelperOutput output)
-    {
-        output.Attributes.SetAttribute("class", "form-control text-center");
-    }
+        => output.Attributes.SetAttribute("class", "form-control text-center");        
 }

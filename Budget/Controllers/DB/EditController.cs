@@ -9,6 +9,8 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Budget.Models.ViewModel;
 using Budget.Models.ViewModel.Helpers;
 using Budget.Models.Database;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Budget.Controllers.DB;
 
@@ -19,20 +21,28 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
     public EditController(UserService userService, Service<TModel, TId> service) : base(userService)
         => this.service = service;
 
-    protected const string partPathToId = "{id}";
-    protected const string partPathAdd = "add";
-    protected const string partPathEdit = "edit";
-    protected const string partPathDelete = "delete";
+    internal protected const string viewModelName = "Model";
+    internal protected const string viewModelsName = "Models";
+
+
+    internal protected const string partPathToId = "{id}";
+    internal protected const string partPathAdd = "add";
+    internal protected const string partPathEdit = "edit";
+    internal protected const string partPathDelete = "delete";
 
     #region Actions
 
-    protected const string pathToModels = "models";
+    internal protected const string pathToModels = "models";
+
+    protected virtual async Task<IEnumerable<TModel>> ModelsAsync()
+            => await service.GetModelsAsync();
 
     protected virtual async Task<IActionResult> GetModelsAsync()
-            => View("Models", await service.GetModelsAsync());
+            => View(viewModelsName, await ModelsAsync());
 
 
-    protected const string pathToModelById = $"{pathToModels}/{partPathToId}";
+    internal protected const string pathToModelById = $"{pathToModels}/{partPathToId}";
+
 
     protected virtual TModel CreateAddModel()
         => service.CreateAddModel();
@@ -97,15 +107,15 @@ public abstract class EditController<TModel, TId> : BudgetController where TMode
 
     #region Action Helpers
 
-    protected IActionResult RedirectToBackIfModelIsNull(IActionResult action, TModel? model)
+    protected IActionResult RedirectToBackIfModelIsNull<T>(IActionResult action, T? model)
         => model is not null ? action : RedirectToBack();
-    protected Task<IActionResult> DoActionIfValid(Func<TModel, Task<IActionResult>> action, ModelWithMode<TModel> modelWithMode)
-        => ModelState.IsValid ? action(modelWithMode.Model!) : GetActionResultAsync(View(modelWithMode));
+    protected Task<IActionResult> DoActionIfValid<T>(Func<T, Task<IActionResult>> action, ModelWithMode<T> modelWithMode, string viewName = viewModelName)
+        => ModelState.IsValid ? action(modelWithMode.Model!) : GetActionResultAsync(View(viewName, modelWithMode));
 
     protected Task<IActionResult> GetActionResultAsync(IActionResult actionResult)
         => Task.FromResult(actionResult);
-    protected IActionResult ViewModel(TModel model, Mode mode)
-        => View("Model", new ModelWithMode<TModel>(model, mode));
+    protected IActionResult ViewModel<T>(T model, Mode mode, string viewName = viewModelName)
+        => View(viewName, new ModelWithMode<T>(model, mode));
 
     #endregion
 }

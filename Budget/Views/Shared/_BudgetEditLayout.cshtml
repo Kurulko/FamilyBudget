@@ -3,15 +3,26 @@
 }
 
 @{
-    Mode mode = ViewBag.Mode;
+    TagAModel tagAModel = ViewBag.TagAModel;
+    Mode mode = tagAModel.Mode;
+
+    TagAModel tagAModelForm = tagAModel;
+    string[] elements = tagAModel.HrefAfterUserId.Split('/');
+    tagAModelForm.HrefAfterUserId = $"{string.Join('/', elements.Take(elements.Length - 1))}/{mode.ToStringAndLower()}";
+
 
     bool isEdit = mode == Mode.Edit || mode == Mode.Add;
     string color = ModeHelper.GetBootstrapColorByMode(mode);
 
-    string pathToForm = ViewBag.PathToForm;
     string pathToEdit = ViewBag.PathToEdit;
 
-    FormModel formModel = new() { Action = $"/{pathToForm}/{mode.ToStringAndLower()}", Mode = mode };
+    TagAModel tagAModelEdit = tagAModel;
+    tagAModelEdit.Mode = Mode.Edit;
+    tagAModelEdit.HrefAfterUserId = $"{tagAModel.HrefAfterUserId}/{tagAModelEdit.Mode.ToStringAndLower()}";
+
+    TagAModel tagAModelDelete = tagAModel;
+    tagAModelDelete.Mode = Mode.Delete;
+    tagAModelDelete.HrefAfterUserId = $"{tagAModel.HrefAfterUserId}/{tagAModelDelete.Mode.ToStringAndLower()}";
 }
 
 @section UnderBody {
@@ -21,21 +32,21 @@
     {
         @if (mode != Mode.Edit)
         {
-            <a href="@($"{pathToEdit}/edit")"
-               class="btn btn-outline-warning">
-                <em>Edit</em>
-            </a>
+            <a model="tagAModelEdit"></a>
         }
-        <a href="@($"{pathToEdit}/delete")"
-           class="btn btn-outline-danger">
-            <em>Delete</em>
-        </a>
+        <a model="tagAModelDelete"></a>
     }
 }
 
-<form-validation form-model="@formModel">
+<form-validation form-model="@tagAModelForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger" style="font-style: oblique;"></div>
     @RenderBody()
 </form-validation>
 
 <br />
 @RenderSection("BelowForm", required: false)
+
+
+@section Link {
+    @RenderSection("Link", required: false)
+}

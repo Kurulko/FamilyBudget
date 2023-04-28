@@ -16,7 +16,7 @@ public class RoleController : ActiveEditController<IdentityRole, string>
 {
     public RoleController(UserService userService, Service<IdentityRole, string> roleService) : base(userService, roleService) { }
 
-    const string name = "roles";
+    internal const string name = "roles";
 
     protected override IActionResult RedirectToBack()
         => Redirect($"/{name}/{pathToModels}");

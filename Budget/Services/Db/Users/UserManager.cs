@@ -20,28 +20,42 @@ public class UserManager : UserService
 
     protected override DbSet<User> models => db.Users;
 
-    public override async Task AddRoleToUserAsync(string roleName, string userId)
+    public override async Task AddNewAndDeleteOldRolesFromUserAsync(string userId, IEnumerable<string> roles)
     {
+        //User user = (await userManager.Users.AsNoTracking().FirstAsync(u => u.Id == userId)); 
         User user = (await GetModelByIdAsync(userId))!;
-        await userManager.AddToRoleAsync(user, roleName);
+
+        IEnumerable<string> userRoles = await userManager.GetRolesAsync(user);
+
+        IEnumerable<string> newRoles = roles.Except(userRoles);
+        await userManager.AddToRolesAsync(user, newRoles);
+
+        IEnumerable<string> oldRoles = userRoles.Except(roles);
+        await userManager.RemoveFromRolesAsync(user, oldRoles);
     }
 
-    public override async Task AddUserPasswordAsync(ChangePassword changePassword, string userId)
+    public override async Task<IdentityResult> AddRoleToUserAsync(string roleName, string userId)
     {
         User user = (await GetModelByIdAsync(userId))!;
-        await userManager.AddPasswordAsync(user, changePassword.NewPassword);
+        return await userManager.AddToRoleAsync(user, roleName);
     }
 
-    public override async Task ChangeUserPasswordAsync(ChangePassword changePassword, string userId)
+    public override async Task<IdentityResult> AddUserPasswordAsync(ChangePassword changePassword, string userId)
     {
         User user = (await GetModelByIdAsync(userId))!;
-        await userManager.ChangePasswordAsync(user, changePassword.OldPassword, changePassword.NewPassword);
+        return await userManager.AddPasswordAsync(user, changePassword.NewPassword);
     }
 
-    public override async Task DeleteRoleFromUserAsync(string userId, string roleName)
+    public override async Task<IdentityResult> ChangeUserPasswordAsync(ChangePassword changePassword, string userId)
     {
         User user = (await GetModelByIdAsync(userId))!;
-        await userManager.RemoveFromRoleAsync(user, roleName);
+        return await userManager.ChangePasswordAsync(user, changePassword.OldPassword, changePassword.NewPassword);
+    }
+
+    public override async Task<IdentityResult> DeleteRoleFromUserAsync(string userId, string roleName)
+    {
+        User user = (await GetModelByIdAsync(userId))!;
+        return await userManager.RemoveFromRoleAsync(user, roleName);
     }
 
     public override async Task<IEnumerable<string>> GetRolesAsync(string userId)
@@ -66,6 +80,12 @@ public class UserManager : UserService
     {
         User user = (await GetModelByIdAsync(userId))!;
         return await userManager.HasPasswordAsync(user);
+    }
+
+    public override async Task<bool> IsInRoleAsync(string userId, string roleName)
+    {
+        User user = (await GetModelByIdAsync(userId))!;
+        return await userManager.IsInRoleAsync(user, roleName);
     }
 
     protected override User CreateModelById(string modelId)

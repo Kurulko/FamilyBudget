@@ -48,7 +48,23 @@ public class OperationManager : OperationService
         return groupsMoney;
     }
 
-    record MonthAndYear(int Month, int Year);
+    record MoneyGroupModelForMonth(TypeOfMoney TypeOfMoney, char CurrencySymbol, MonthAndYear MonthAndYear);
+    public override IEnumerable<GroupMoneyForMonth> GetCurrentSumsOfMoneyForMonth()
+    {
+        IEnumerable<Operation> operations = models.Include(u => u.Money).ThenInclude(m => m!.Currency).ToList().Where(u => PredicateForModels()(u));
+
+        IEnumerable<GroupMoneyForMonth> groupsMoney = operations.GroupBy(
+            o => new MoneyGroupModelForMonth(o.Money!.TypeOfMoney, o.Money!.Currency!.Symbol, new MonthAndYear(o.DateTime.Month, o.DateTime.Year)),
+            o => new OperationGroupModel(o.Money!.Price, o.TypeOfOperation),
+            (mm, operations) =>
+            {
+                decimal sumOfMoney = operations.Select(o => o.Money * (o.TypeOfOperation == TypeOfOperation.Purchase ? -1 : 1)).Sum();
+                return new GroupMoneyForMonth(mm.TypeOfMoney, mm.CurrencySymbol, sumOfMoney, mm.MonthAndYear, operations.Select(o => o.TypeOfOperation));
+            });
+
+        return groupsMoney;
+    }
+
     IEnumerable<GroupOperation> GetGroupsOperation(IEnumerable<Operation> operations)
         => operations.GroupBy(o => new MonthAndYear(o.DateTime.Month, o.DateTime.Year),
             (MonthAndYear may, IEnumerable<Operation> ops) => new GroupOperation() { Month = may.Month, Year = may.Year, Operations = ops });

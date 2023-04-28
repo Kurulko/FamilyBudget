@@ -5,16 +5,16 @@ namespace Budget.Models.ViewModel.Account;
 
 public class ChangePassword
 {
-    [Display(Name = "Old password*")]
+    [Display(Name = "Old password")]
     [DataType(DataType.Password)]
     public string? OldPassword { get; set; }
 
-    [Display(Name = "New password*")]
+    [Display(Name = "New password")]
     [Required(ErrorMessage = "Enter new password")]
     [DataType(DataType.Password)]
     public string NewPassword { get; set; } = null!;
 
-    [Display(Name = "Repeat new password*")]
+    [Display(Name = "Repeat new password")]
     [Required(ErrorMessage = "Repeat new password")]
     [DataType(DataType.Password)]
     [Compare("NewPassword", ErrorMessage = "Passwords don't match")]

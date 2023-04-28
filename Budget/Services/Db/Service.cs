@@ -24,16 +24,18 @@ public abstract class Service<TModel, TId> where TModel : class
     public virtual TModel CreateAddModel()
         => CreateModelById(default!);
 
-    public virtual async Task<TModel?> GetModelByIdAsync(TId modelId)
-        => (await models.ToListAsync()).FirstOrDefault(o => PredicateForModelById(modelId)(o));
+    protected IQueryable<TModel> modelsNoTracking => models.AsNoTracking();
 
+    public virtual async Task<TModel?> GetModelByIdAsync(TId modelId)
+        => (await modelsNoTracking.ToListAsync()).FirstOrDefault(o => PredicateForModelById(modelId)(o));
     public virtual async Task<TModel?> GetModelDetailsByIdAsync(TId modelId)
         => await GetModelByIdAsync(modelId);
 
     public virtual async Task<IEnumerable<TModel>> GetModelsAsync()
-        => (await models.ToListAsync()).Where(m => PredicateForModels()(m));
+        => (await modelsNoTracking.ToListAsync()).Where(m => PredicateForModels()(m));
+
     public virtual async Task<IEnumerable<TModel>> GetModelsByPredicateAsync(Func<TModel, bool> predicate)
-        => (await models.ToListAsync()).Where(m => PredicateForModels()(m) && predicate(m));
+        => (await modelsNoTracking.ToListAsync()).Where(m => PredicateForModels()(m) && predicate(m));
 
 
     public virtual async Task AddModelAsync(TModel model)

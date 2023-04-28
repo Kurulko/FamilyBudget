@@ -19,6 +19,7 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Registered</th>
@@ -29,6 +30,7 @@
                     @foreach (User user in Model)
                     {
                         <tr>
+                            <td>@user.Id</td>
                             <td>@user.UserName</td>
                             <td>@user.Email</td>
                             <td>@user.RegisteredTime</td>

@@ -8,7 +8,7 @@ namespace Budget.TagHelpers;
 
 public class FormValidationTagHelper : TagHelper
 {
-    public FormModel FormModel { get; set; } = null!;
+    public TagAModel FormModel { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
@@ -16,15 +16,7 @@ public class FormValidationTagHelper : TagHelper
 
         form.AddCssClass("form-group");
         form.Attributes.Add("method", "post");
-        form.Attributes.Add("action", FormModel.Action);
-
-        TagBuilder divVal = new("div");
-
-        divVal.AddCssClass("text-danger");
-        divVal.Attributes.Add("style", "font-style: oblique;");
-        divVal.Attributes.Add("asp-validation-summary", "ModelOnly");
-
-        form.InnerHtml.AppendHtml(divVal);
+        form.Attributes.Add("action", FormModel.GetHref());
 
         var childContent = await output.GetChildContentAsync();
         form.InnerHtml.AppendHtml(childContent);
@@ -35,10 +27,9 @@ public class FormValidationTagHelper : TagHelper
             TagBuilder submit = new("input");
 
             string color = ModeHelper.GetBootstrapColorByMode(mode);
-            submit.AddCssClass($"btn btn-outline-{color}");
-
-            submit.Attributes.Add("value", mode.ToString());
             submit.Attributes.Add("type", "submit");
+            submit.Attributes.Add("value", mode.ToString());
+            submit.AddCssClass($"btn btn-outline-{color}");
 
             form.InnerHtml.AppendHtml(submit);
         }

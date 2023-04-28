@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using Budget.Services.Db.Operations;
 using Budget.Services.Db.Categories;
 using Budget.Extensions;
+using static Budget.Services.Db.Operations.OperationManager;
 
 namespace Budget.Controllers.DB;
 
@@ -29,8 +30,8 @@ public class OperationController : DbModelEditController<Operation>
     protected override IActionResult RedirectToBack()
         => Redirect($"/{name}/{typeOfOperation.ToStringAndLower()}/{pathToModels}");
 
-    const string name = "operations";
-    const string urlOfModels = "{type}/" + pathToModels;
+    internal const string name = "operations";
+    internal const string urlOfModels = "{type}/" + pathToModels;
 
     protected override Operation CreateAddModel()
     {
@@ -122,7 +123,26 @@ public class OperationController : DbModelEditController<Operation>
         var groupsMoney = operationService.GetCurrentSumsOfMoney();
         var groupsOperation = await operationService.GetGroupsOperationByPredicateAsync(o => o.TypeOfOperation == type);
 
-        return View("Models", new ModelWithTypeOfOperation<GroupsOperationAndGroupsMoney>(new GroupsOperationAndGroupsMoney() { GroupsMoney = groupsMoney, GroupsOperation = groupsOperation }, type));
+        return View(viewModelsName, new ModelWithTypeOfOperation<GroupsOperationAndGroupsMoney>(new GroupsOperationAndGroupsMoney() { GroupsMoney = groupsMoney, GroupsOperation = groupsOperation }, type));
+    }
+
+
+    internal const string pathToCompare = "compare";
+    internal const string viewCompareName = "Compare";
+
+    [HttpGet(pathToCompare)]
+    [HttpGet($"{partPathToUserId}/{pathToCompare}")]
+    public async Task<IActionResult> CompareAsync(string? userId, [FromServices] Service<Currency, long> currencyService)
+    {
+        ViewBag.Currencies = await currencyService.GetModelsAsync();
+
+        SetUserId(userId);
+
+        OperationService operationService = (service as OperationService)!;
+
+        var groupsMoney = operationService.GetCurrentSumsOfMoneyForMonth();
+
+        return View(viewCompareName, groupsMoney);
     }
 
 

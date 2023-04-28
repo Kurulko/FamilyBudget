@@ -26,5 +26,5 @@ public abstract class DbModelService<TModel> : Service<TModel, long> where TMode
         => new TModel() { Id = modelId, UserId = UserId };
 
     public virtual async Task<IEnumerable<TModel>> GetAllModelsAsync()
-        => await models.ToListAsync();
+        => await modelsNoTracking.ToListAsync();
 }

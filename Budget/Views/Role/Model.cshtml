@@ -5,16 +5,21 @@
     Layout = "_BudgetEditLayout";
 
     Mode mode = Model.Mode;
-    IdentityRole? role = Model.Model;
+    string roleId = Model.Model.Id;
 
     bool isEdit = mode == Mode.Edit || mode == Mode.Add;
 
     ViewBag.Title = "Role";
-    ViewBag.Mode = mode;
+    string? userId = ViewBag.UserId;
 
-    string pathToForm = "/roles/models";
-    ViewBag.PathToForm = pathToForm;
-    ViewBag.PathToEdit = $"{pathToForm}/{role.Id}";
+    TagAModel tagAModel = new()
+            {
+                HrefBeforeUserId = RoleController.name,
+                HrefAfterUserId = $"{RoleController.pathToModels}/{roleId}",
+                UserId = userId,
+                Mode = mode
+            };
+    ViewBag.TagAModel =  tagAModel;
 }
 
 
@@ -28,6 +33,10 @@
         @if (isEdit)
         {
             <p><span asp-validation-for="Model.Name" class="text-danger"></span></p>
+        }
+        else
+        {
+            <br />
         }
     </div>
     <div class="col"></div>

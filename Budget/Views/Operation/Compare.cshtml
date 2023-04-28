@@ -1,0 +1,60 @@
+﻿@model IEnumerable<GroupMoneyForMonth>
+@{
+    ViewBag.Title = "Compare";
+    var results = Model.OrderBy(m => m.MonthAndYear.Year).ThenBy(m => m.MonthAndYear.Month).GroupBy(m => m.MonthAndYear);
+
+    IEnumerable<Currency> currencies = ViewBag.Currencies;
+    int countOfCurrencies = currencies.Count();
+}
+
+@*<partial name="_OperationLayout" for="@groupsMoney" />
+*@
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th colspan="@countOfCurrencies" class="text-center">@TypeOfMoney.Card</th>
+                <th colspan="@countOfCurrencies" class="text-center">@TypeOfMoney.Cash</th>
+            </tr>
+            <tr>
+                <th></th>
+                @for (int i = 0; i < 2; i++)
+                {
+                    @foreach (Currency currency in currencies.OrderBy(c => c.Symbol))
+                    {
+                        <th>@currency.Symbol</th>
+                    }
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in results)
+            {
+                MonthAndYear monthAndYear = result.Key;
+                DateTime date = DateTime.MinValue.AddYears(monthAndYear.Year - 1).AddMonths(monthAndYear.Month - 1);
+                <tr>
+                    <th>@date.ToString("MMMM yyyy") :</th>
+                    @foreach (TypeOfMoney typeOfMoney in Enum.GetValues<TypeOfMoney>())
+                    {
+                        @foreach (Currency currency in currencies.OrderBy(c => c.Symbol))
+                        {
+                            @if (result.FirstOrDefault(r => r.TypeOfMoney == typeOfMoney && r.CurrencySymbol == currency.Symbol) is { } item)
+                            {
+                                <td>@Currency.Display(item.CurrencySymbol, item.SumOfMoney)</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                        }
+                    }
+                </tr>
+            }
+        <tbody>
+    </table>
+    <br />
+    <br />
+}
+

@@ -13,6 +13,7 @@ public class AccountController : MainController
     public AccountController(IAccountService accountService)
         => this.accountService = accountService;
 
+
     [HttpGet("register")]
     public IActionResult Register() => View();
 
@@ -54,6 +55,7 @@ public class AccountController : MainController
         }
         return View(model);
     }
+
 
     [HttpGet("logout")]
     public async Task<IActionResult> Logout()
